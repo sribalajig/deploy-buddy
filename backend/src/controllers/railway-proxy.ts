@@ -1,14 +1,14 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { RailwayServices } from '../services/railway-services';
+import { RailwayProxy } from '../services/railway-proxy';
 import { injectable } from 'tsyringe';
 
 @injectable()
-export class RailwayServicesController {
-  constructor(private railwayServices: RailwayServices) {}
+export class RailwayProxyController {
+  constructor(private railwayProxyService: RailwayProxy) {}
 
   async getAvailableServices(request: FastifyRequest, reply: FastifyReply) {
     try {
-      const services = await this.railwayServices.getAvailableServices();
+      const services = await this.railwayProxyService.getAvailableServices();
       return reply.code(200).send({ services });
     } catch (error) {
       request.log.error(error);

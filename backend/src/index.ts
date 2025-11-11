@@ -1,12 +1,12 @@
 import 'dotenv/config';
 import Fastify from 'fastify';
-import { railwayServicesRoutes } from './routes/railway-services.routes';
+import { railwayProxyRoutes } from './routes/railway-proxy.routes';
 
 const fastify = Fastify({
   logger: true
 });
 
-fastify.register(railwayServicesRoutes);
+fastify.register(railwayProxyRoutes);
 
 const defaultPort = 3000;
 

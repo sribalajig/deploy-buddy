@@ -4,12 +4,12 @@ import { executeGraphQLQuery } from '../utils/http';
 import { getConfig } from '../utils/config';
 import { GraphQLResponse } from '../models/railway-api-response';
 
-interface IRailwayService {
+interface IRailwayProxy {
     getAvailableServices(): Promise<RailwayService[]>;
 }
 
 @injectable()
-export class RailwayServices implements IRailwayService {
+export class RailwayProxy implements IRailwayProxy {
     public async getAvailableServices(): Promise<RailwayService[]> {
         try {
             const data = await this.getProjectData();
@@ -59,4 +59,4 @@ export class RailwayServices implements IRailwayService {
     }
 }
 
-export type { IRailwayService };
+export type { IRailwayProxy as IRailwayService };
