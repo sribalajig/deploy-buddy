@@ -1,14 +1,13 @@
 import Fastify from 'fastify';
+import { railwayServicesRoutes } from './routes/railway-services.routes';
 
 const fastify = Fastify({
   logger: true
 });
 
-const defaultPort = 3000;
+fastify.register(railwayServicesRoutes);
 
-fastify.get('/hello', async (request, reply) => {
-  return { message: 'Hello, World!' };
-});
+const defaultPort = 3000;
 
 const start = async () => {
   let applicationPort: number = defaultPort;
