@@ -1,9 +1,20 @@
 import 'dotenv/config';
 import Fastify from 'fastify';
 import { railwayProxyRoutes } from './routes/railway-proxy.routes';
+import { getConfig } from './utils/config';
+import cors from '@fastify/cors';
 
 const fastify = Fastify({
-  logger: true
+    logger: true
+  });
+  
+const corsOrigins = getConfig('CORS_ORIGINS')
+  .split(',')
+  .map(origin => origin.trim())
+  .filter(origin => origin.length > 0);
+
+fastify.register(cors, {
+  origin: corsOrigins.length > 0 ? corsOrigins : true,
 });
 
 fastify.register(railwayProxyRoutes);
