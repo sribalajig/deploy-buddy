@@ -16,3 +16,9 @@ export function shouldDisableStart(status: string | null | undefined): boolean {
   const upperStatus = status.toUpperCase();
   return upperStatus === 'SUCCESS' || isNonTerminalState(status);
 }
+
+export function shouldDisableStop(status: string | null | undefined): boolean {
+    if (!status) return true;
+    const upperStatus = status.toUpperCase();
+    return upperStatus === 'REMOVED' || isNonTerminalState(status);
+}

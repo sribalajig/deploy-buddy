@@ -15,7 +15,7 @@ export function DeployButton({ serviceId, serviceName, environmentId, latestDepl
   const [deploymentStatus, setDeploymentStatus] = useState<string | null>(null);
 
   const handleDeploy = async (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent event from bubbling to parent
+    e.stopPropagation();
     if (!environmentId) {
       setDeploymentStatus('Please select an environment first');
       return;
@@ -29,7 +29,6 @@ export function DeployButton({ serviceId, serviceName, environmentId, latestDepl
       setDeploymentStatus(`Deployment failed: ${result.message || 'Unknown error'}`);
     }
 
-    // Clear status message after 5 seconds
     setTimeout(() => setDeploymentStatus(null), 5000);
   };
 

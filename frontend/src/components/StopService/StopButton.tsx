@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useStopService } from '../../hooks/useStopService';
 import './StopButton.css';
+import { isNonTerminalState, shouldDisableStop } from '../../utils/deployment-status';
 
 interface StopButtonProps {
   serviceId: string;
@@ -27,7 +28,9 @@ export function StopButton({ serviceId, serviceName, onStopSuccess, deploymentSt
     setTimeout(() => setStopStatus(null), 5000);
   };
 
-  const isDisabled = loading || deploymentStatus?.toLowerCase() === 'removed';
+  const isDisabled = loading || shouldDisableStop(deploymentStatus);
+
+  console.log('deploymentStatus : ', deploymentStatus, 'isDisabled : ', isDisabled);
 
   return (
     <div className="stop-button-container">
@@ -35,11 +38,16 @@ export function StopButton({ serviceId, serviceName, onStopSuccess, deploymentSt
         className={`stop-button ${loading ? 'loading' : ''} ${isDisabled ? 'disabled' : ''}`}
         onClick={handleStop}
         disabled={isDisabled}
-        title={deploymentStatus === 'Removed' ? 'Service is already removed' : `Stop ${serviceName}`}
+        title={
+          deploymentStatus?.toUpperCase() === 'REMOVED' 
+            ? 'Service is already removed' 
+            : isNonTerminalState(deploymentStatus)
+            ? 'Cannot stop service while deployment is in progress'
+            : `Stop ${serviceName}`
+        }
       >
         {loading ? 'Stopping...' : 'Stop'}
       </button>
-      {/* ... existing status message ... */}
     </div>
   );
 }
