@@ -6,6 +6,20 @@ interface EnvironmentNode {
 interface ServiceNode {
     id: string;
     name: string;
+    deployments?: {
+        edges: Array<{
+            node: {
+                status: string;
+                id: string;
+                canRedeploy: boolean;
+                deploymentStopped: boolean;
+                environmentId: string;
+                createdAt: string;
+                updatedAt: string;
+                statusUpdatedAt: string;
+            };
+        }>;
+    };
 }
 
 export interface ProjectData {

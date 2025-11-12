@@ -13,9 +13,23 @@ export class Environment {
 }
 
 export class Service {
-    constructor(public id: string, public name: string) {
+    constructor(
+        public id: string, 
+        public name: string,
+        public latestDeployment?: {
+            id: string;
+            status: string;
+            canRedeploy: boolean;
+            deploymentStopped: boolean;
+            environmentId: string;
+            createdAt: string;
+            updatedAt: string;
+            statusUpdatedAt: string;
+        } | null
+    ) {
         this.id = id;
         this.name = name;
+        this.latestDeployment = latestDeployment;
     }
 }
 

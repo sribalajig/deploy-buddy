@@ -144,27 +144,55 @@ export class RailwayProxy implements IRailwayProxy {
                             node {
                                 id
                                 name
+                                deployments(first: 1) {
+                                    edges {
+                                        node {
+                                            status
+                                            id
+                                            canRedeploy
+                                            deploymentStopped
+                                            environmentId
+                                            createdAt
+                                            updatedAt
+                                            statusUpdatedAt
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
                 }
             }
         `;
-
+    
         const result = await executeGraphQLQuery(query, {
             projectId: getConfig('RAILWAY_PROJECT_ID'),
         });
-
+    
         const projectData = result.data as ProjectData;
-
-        const services: Service[] = projectData?.project?.services?.edges?.map(edge =>
-            new Service(edge.node.id, edge.node.name)
-        ) ?? [];
-
+    
+        const services: Service[] = projectData?.project?.services?.edges?.map(edge => {
+            const latestDeployment = edge.node.deployments?.edges?.[0]?.node;
+            return new Service(
+                edge.node.id,
+                edge.node.name,
+                latestDeployment ? {
+                    id: latestDeployment.id,
+                    status: latestDeployment.status,
+                    canRedeploy: latestDeployment.canRedeploy,
+                    deploymentStopped: latestDeployment.deploymentStopped,
+                    environmentId: latestDeployment.environmentId,
+                    createdAt: latestDeployment.createdAt,
+                    updatedAt: latestDeployment.updatedAt,
+                    statusUpdatedAt: latestDeployment.statusUpdatedAt,
+                } : null
+            );
+        }) ?? [];
+    
         const environments: Environment[] = projectData?.project?.environments?.edges?.map(edge =>
             new Environment(edge.node.id, edge.node.name)
         ) ?? [];
-
+    
         return new ProjectDetails(
             services,
             environments
