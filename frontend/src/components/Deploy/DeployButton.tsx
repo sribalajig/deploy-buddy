@@ -6,10 +6,11 @@ interface DeployButtonProps {
   serviceId: string;
   serviceName: string;
   environmentId: string | null;
+  deploymentStatus: string | null;
 }
 
 export function DeployButton({ serviceId, serviceName, environmentId }: DeployButtonProps) {
-  const { deploy, loading, error } = useDeployService();
+  const { deploy, loading } = useDeployService();
   const [deploymentStatus, setDeploymentStatus] = useState<string | null>(null);
 
   const handleDeploy = async (e: React.MouseEvent) => {
@@ -18,20 +19,20 @@ export function DeployButton({ serviceId, serviceName, environmentId }: DeployBu
       setDeploymentStatus('Please select an environment first');
       return;
     }
-  
+
     const result = await deploy(environmentId, serviceId);
-    
+
     if (result.success) {
       setDeploymentStatus(`Deployment started! ID: ${result.deploymentId}`);
     } else {
       setDeploymentStatus(`Deployment failed: ${result.message || 'Unknown error'}`);
     }
-  
+
     // Clear status message after 5 seconds
     setTimeout(() => setDeploymentStatus(null), 5000);
   };
 
-  const isDisabled = !environmentId || loading;
+  const isDisabled = loading || deploymentStatus?.toLowerCase() === 'success';
 
   return (
     <div className="deploy-button-container">
@@ -39,15 +40,16 @@ export function DeployButton({ serviceId, serviceName, environmentId }: DeployBu
         className={`deploy-button ${isDisabled ? 'disabled' : ''}`}
         onClick={handleDeploy}
         disabled={isDisabled}
-        title={!environmentId ? 'Select an environment first' : `Start ${serviceName}`}
+        title={
+          deploymentStatus === 'Removed'
+            ? 'Cannot start removed service'
+            : !environmentId
+              ? 'Select an environment first'
+              : `Start ${serviceName}`
+        }
       >
         {loading ? 'Starting...' : 'Start'}
       </button>
-      {deploymentStatus && (
-        <div className={`deployment-status ${error ? 'error' : 'success'}`}>
-          {deploymentStatus}
-        </div>
-      )}
     </div>
   );
 }

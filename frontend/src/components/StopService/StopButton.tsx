@@ -6,43 +6,40 @@ interface StopButtonProps {
   serviceId: string;
   serviceName: string;
   onStopSuccess?: () => void;
+  deploymentStatus: string | null;
 }
 
-export function StopButton({ serviceId, serviceName, onStopSuccess }: StopButtonProps) {
-  const { stopService, loading, error } = useStopService();
+export function StopButton({ serviceId, serviceName, onStopSuccess, deploymentStatus }: StopButtonProps) {
+  const { stopService, loading } = useStopService();
   const [stopStatus, setStopStatus] = useState<string | null>(null);
 
   const handleStop = async (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent event from bubbling to parent
+    e.stopPropagation(); 
     const result = await stopService(serviceId);
     
     if (result.success) {
       setStopStatus('Service stopped successfully');
-      // Call success callback if provided
       onStopSuccess?.();
     } else {
       setStopStatus(`Failed to stop: ${result.message || 'Unknown error'}`);
     }
   
-    // Clear status message after 5 seconds
     setTimeout(() => setStopStatus(null), 5000);
   };
+
+  const isDisabled = loading || deploymentStatus?.toLowerCase() === 'removed';
 
   return (
     <div className="stop-button-container">
       <button
-        className={`stop-button ${loading ? 'loading' : ''}`}
+        className={`stop-button ${loading ? 'loading' : ''} ${isDisabled ? 'disabled' : ''}`}
         onClick={handleStop}
-        disabled={loading}
-        title={`Stop ${serviceName}`}
+        disabled={isDisabled}
+        title={deploymentStatus === 'Removed' ? 'Service is already removed' : `Stop ${serviceName}`}
       >
         {loading ? 'Stopping...' : 'Stop'}
       </button>
-      {stopStatus && (
-        <div className={`stop-status ${error ? 'error' : 'success'}`}>
-          {stopStatus}
-        </div>
-      )}
+      {/* ... existing status message ... */}
     </div>
   );
 }

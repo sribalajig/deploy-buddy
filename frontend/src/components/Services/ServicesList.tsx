@@ -13,10 +13,10 @@ interface ServicesListProps {
   selectedServiceId?: string | null;
 }
 
-export function ServicesList({ 
-  services, 
-  loading = false, 
-  error = null, 
+export function ServicesList({
+  services,
+  loading = false,
+  error = null,
   onRefresh,
   selectedEnvironmentId,
   onServiceClick,
@@ -56,32 +56,49 @@ export function ServicesList({
   return (
     <div className="services-list-container">
       <ul className="services-list">
-        {services.map((service) => (
-          <li 
-            key={service.id} 
-            className={`service-item ${selectedServiceId === service.id ? 'selected' : ''}`}
-            onClick={() => onServiceClick?.(service)}
-          >
-            <div className="service-header">
-              <div className="service-info">
-                <div className="service-name">{service.name}</div>
-                <div className="service-id">{service.id}</div>
+        {services.map((service) => {
+          const status = service.latestDeployment?.status ?? null;
+          const lastDeployedAt = service.latestDeployment?.updatedAt;
+
+          return (
+            <li
+              key={service.id}
+              className={`service-item ${selectedServiceId === service.id ? 'selected' : ''}`}
+              onClick={() => onServiceClick?.(service)}
+            >
+              <div className="service-header">
+                <div className="service-info">
+                  <div className="service-name">{service.name}</div>
+                  <div className="service-id">{service.id}</div>
+                  {status && (
+                    <div className={`service-status status-${status.toLowerCase()}`}>
+                      {status.charAt(0) + status.slice(1).toLowerCase()}
+                    </div>
+                  )}
+                  {lastDeployedAt && (
+                    <div className="service-last-deployed">
+                      Last deployed: {new Date(lastDeployedAt).toLocaleString()}
+                    </div>
+                  )}
+                </div>
+                <div className="service-actions">
+                  <DeployButton
+                    serviceId={service.id}
+                    serviceName={service.name}
+                    environmentId={selectedEnvironmentId ?? null}
+                    deploymentStatus={status}
+                  />
+                  <StopButton
+                    serviceId={service.id}
+                    serviceName={service.name}
+                    onStopSuccess={onRefresh}
+                    deploymentStatus={status}
+                  />
+                </div>
               </div>
-              <div className="service-actions">
-                <DeployButton
-                  serviceId={service.id}
-                  serviceName={service.name}
-                  environmentId={selectedEnvironmentId}
-                />
-                <StopButton
-                  serviceId={service.id}
-                  serviceName={service.name}
-                  onStopSuccess={onRefresh}
-                />
-              </div>
-            </div>
-          </li>
-        ))}
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
