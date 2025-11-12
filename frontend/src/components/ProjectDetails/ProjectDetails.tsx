@@ -60,7 +60,6 @@ export function ProjectDetails() {
   return (
     <div className="project-details-container">
       <div className="project-details-header">
-        <h1>Railway Project</h1>
         <div className="project-details-actions">
           <EnvironmentsDropdown
             environments={projectDetails.environments}

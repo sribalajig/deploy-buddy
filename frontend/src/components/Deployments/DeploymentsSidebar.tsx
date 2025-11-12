@@ -48,7 +48,7 @@ export function DeploymentsSidebar({ service, isOpen, onClose }: DeploymentsSide
             <ul className="deployments-list">
               {deployments.map((deployment) => (
                 <li key={deployment.id} className="deployment-item">
-                  <div>
+                  <div className={`deployment-status status-${deployment.status?.toLowerCase() || 'unknown'}`}>
                     {deployment.status ? deployment.status.charAt(0) + deployment.status.slice(1).toLowerCase() : 'Unknown'}
                   </div>
                   <div className="deployment-details">

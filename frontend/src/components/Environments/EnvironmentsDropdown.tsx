@@ -31,7 +31,6 @@ export function EnvironmentsDropdown({
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
       >
-        <span className="environments-label">Environment:</span>
         <span className="environments-selected">
           {selectedEnvironment?.name || 'Select environment'}
         </span>
