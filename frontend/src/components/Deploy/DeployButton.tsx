@@ -38,9 +38,9 @@ export function DeployButton({ serviceId, serviceName, environmentId }: DeployBu
         className={`deploy-button ${isDisabled ? 'disabled' : ''}`}
         onClick={handleDeploy}
         disabled={isDisabled}
-        title={!environmentId ? 'Select an environment first' : `Deploy ${serviceName}`}
+        title={!environmentId ? 'Select an environment first' : `Start ${serviceName}`}
       >
-        {loading ? 'Deploying...' : 'Deploy'}
+        {loading ? 'Starting...' : 'Start'}
       </button>
       {deploymentStatus && (
         <div className={`deployment-status ${error ? 'error' : 'success'}`}>
