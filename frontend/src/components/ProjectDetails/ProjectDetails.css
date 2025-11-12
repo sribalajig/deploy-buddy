@@ -1,6 +1,6 @@
 .project-details-container {
-  max-width: 1200px;
-  margin: 0 auto;
+  width: 100%;
+  margin: 0;
   padding: 2rem;
   position: relative;
 }
@@ -45,8 +45,16 @@
   transform: scale(0.98);
 }
 
-.project-details-content {
+.project-details-layout {
+  display: flex;
+  gap: 1rem;
   margin-top: 1rem;
+  height: calc(100vh - 200px); 
+}
+
+.project-details-content {
+  flex: 1; 
+  overflow-y: auto;
 }
 
 .loading,

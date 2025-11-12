@@ -18,6 +18,13 @@ export function ProjectDetails() {
     }
   }, [projectDetails, selectedEnvironment]);
 
+  useEffect(() => {
+    if (projectDetails?.services && projectDetails.services.length > 0 && !selectedService) {
+      setSelectedService(projectDetails.services[0]);
+      setIsSidebarOpen(true);
+    }
+  }, [projectDetails, selectedService]);
+
   const handleServiceClick = (service: RailwayService) => {
     setSelectedService(service);
     setIsSidebarOpen(true);
@@ -71,23 +78,25 @@ export function ProjectDetails() {
           </button>
         </div>
       </div>
-      <div className="project-details-content">
-        <ServicesList
-          services={projectDetails.services}
-          loading={loading}
-          error={error}
-          onRefresh={refetch}
-          selectedEnvironmentId={selectedEnvironment?.id || null}
-          onServiceClick={handleServiceClick}
-          selectedServiceId={selectedService?.id || null}
+      <div className="project-details-layout">
+        <div className="project-details-content">
+          <ServicesList
+            services={projectDetails.services}
+            loading={loading}
+            error={error}
+            onRefresh={refetch}
+            selectedEnvironmentId={selectedEnvironment?.id || null}
+            onServiceClick={handleServiceClick}
+            selectedServiceId={selectedService?.id || null}
+          />
+        </div>
+        <DeploymentsSidebar
+          environment={selectedEnvironment}
+          service={selectedService}
+          isOpen={isSidebarOpen}
+          onClose={handleSidebarClose}
         />
       </div>
-      <DeploymentsSidebar
-        environment={selectedEnvironment}
-        service={selectedService}
-        isOpen={isSidebarOpen}
-        onClose={handleSidebarClose}
-      />
     </div>
   );
 }
