@@ -16,16 +16,7 @@ export class Service {
     constructor(
         public id: string, 
         public name: string,
-        public latestDeployment?: {
-            id: string;
-            status: string;
-            canRedeploy: boolean;
-            deploymentStopped: boolean;
-            environmentId: string;
-            createdAt: string;
-            updatedAt: string;
-            statusUpdatedAt: string;
-        } | null
+        public latestDeployment?: Deployment
     ) {
         this.id = id;
         this.name = name;
@@ -48,7 +39,6 @@ export class Deployment {
         public status: string,
         public statusUpdatedAt: string,
         public staticUrl: string | null,
-        public service: Service
     ) {
         this.id = id;
         this.createdAt = createdAt;
@@ -56,6 +46,5 @@ export class Deployment {
         this.status = status;
         this.statusUpdatedAt = statusUpdatedAt;
         this.staticUrl = staticUrl;
-        this.service = service;
     }
 }

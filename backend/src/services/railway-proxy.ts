@@ -96,7 +96,6 @@ export class RailwayProxy implements IRailwayProxy {
                     edge.node.status,
                     edge.node.statusUpdatedAt,
                     edge.node.staticUrl,
-                    new Service(edge.node.service.id, edge.node.service.name)
                 )
             ) ?? [];
 
@@ -106,7 +105,6 @@ export class RailwayProxy implements IRailwayProxy {
             throw error;
         }
     }
-
 
     public async removeDeployment(deploymentId: string): Promise<boolean> {
         try {
@@ -158,21 +156,56 @@ export class RailwayProxy implements IRailwayProxy {
 
         const projectData = result.data as ProjectData;
 
-        const services: Service[] = projectData?.project?.services?.edges?.map(edge => {
-            return new Service(
-                edge.node.id,
-                edge.node.name
-            );
-        }) ?? [];
-
         const environments: Environment[] = projectData?.project?.environments?.edges?.map(edge =>
             new Environment(edge.node.id, edge.node.name)
         ) ?? [];
+
+        const defaultEnvironmentId = environments[0]?.id;
+
+        const services: Service[] = await Promise.all(
+            (projectData?.project?.services?.edges ?? []).map(async (edge) => {
+                const service = new Service(edge.node.id, edge.node.name);
+                
+                if (defaultEnvironmentId) {
+                    const latestDeployment = await this.getLatestDeploymentForService(
+                        defaultEnvironmentId, 
+                        edge.node.id, 
+                        service
+                    );
+                    service.latestDeployment = latestDeployment ?? undefined;
+                }
+                
+                return service;
+            })
+        );
 
         return new ProjectDetails(
             services,
             environments
         );
+    }
+
+    private async getLatestDeploymentForService(environmentId: string, serviceId: string, service: Service): Promise<Deployment | null> {
+        try {
+            const deployments = await this.getDeployments(environmentId, serviceId, 1);
+            const latest = deployments[0];
+            
+            if (!latest) {
+                return null;
+            }
+            
+            return new Deployment(
+                latest.id,
+                latest.createdAt,
+                latest.updatedAt,
+                latest.status,
+                latest.statusUpdatedAt,
+                latest.staticUrl,
+            );
+        } catch (error) {
+            console.error(`Error fetching latest deployment for service ${serviceId}:`, error);
+            return null;
+        }
     }
 }
 
