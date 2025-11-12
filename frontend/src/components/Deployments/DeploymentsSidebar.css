@@ -17,6 +17,7 @@
   flex-direction: column;
   overflow-y: auto;
   min-width: 0;
+  padding: 1rem;
 }
 
 @keyframes fadeIn {
