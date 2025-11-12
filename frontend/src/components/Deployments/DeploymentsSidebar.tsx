@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { useDeployments } from '../../hooks/useDeployments';
+import { useDeploymentLogs } from '../../hooks/useDeploymentLogs';
 import type { RailwayService, RailwayEnvironment } from '../../types/railway-service';
 import './DeploymentsSidebar.css';
 
@@ -13,6 +15,11 @@ export function DeploymentsSidebar({ environment, service, isOpen, onClose }: De
   const { deployments, loading, error, refetch } = useDeployments(
     environment?.id || null, 
     service?.id || null);
+  const [expandedDeploymentId, setExpandedDeploymentId] = useState<string | null>(null);
+
+  const toggleLogs = (deploymentId: string) => {
+    setExpandedDeploymentId(expandedDeploymentId === deploymentId ? null : deploymentId);
+  };
 
   return (
     <div className={`deployments-sidebar ${isOpen ? 'open' : 'closed'}`}>
@@ -47,29 +54,69 @@ export function DeploymentsSidebar({ environment, service, isOpen, onClose }: De
 
         {isOpen && !loading && !error && deployments.length > 0 && (
           <ul className="deployments-list">
-            {deployments.map((deployment, index) => (
-              <li key={deployment.id} className={`deployment-item ${index === 0 ? 'current-deployment' : ''}`}>
-                {index === 0 && (
-                  <div className="current-deployment-label">Current deployment</div>
-                )}
-                <div className="deployment-header">
-                  <div className={`deployment-status status-${deployment.status?.toLowerCase() || 'unknown'}`}>
-                    {deployment.status ? deployment.status.charAt(0) + deployment.status.slice(1).toLowerCase() : 'Unknown'}
+            {deployments.map((deployment, index) => {
+              const isExpanded = expandedDeploymentId === deployment.id;
+              return (
+                <li key={deployment.id} className={`deployment-item ${index === 0 ? 'current-deployment' : ''}`}>
+                  {index === 0 && (
+                    <div className="current-deployment-label">Current deployment</div>
+                  )}
+                  <div className="deployment-header">
+                    <div className={`deployment-status status-${deployment.status?.toLowerCase() || 'unknown'}`}>
+                      {deployment.status ? deployment.status.charAt(0) + deployment.status.slice(1).toLowerCase() : 'Unknown'}
+                    </div>
+                    <div className="deployment-meta">
+                      <span className="deployment-time">
+                        Created: {new Date(deployment.createdAt).toLocaleString()}
+                      </span>
+                      <span className="deployment-time">
+                        Updated: {new Date(deployment.updatedAt).toLocaleString()}
+                      </span>
+                    </div>
                   </div>
-                  <div className="deployment-meta">
-                    <span className="deployment-time">
-                      Created: {new Date(deployment.createdAt).toLocaleString()}
-                    </span>
-                    <span className="deployment-time">
-                      Updated: {new Date(deployment.updatedAt).toLocaleString()}
-                    </span>
-                  </div>
-                </div>
-              </li>
-            ))}
+                  <button 
+                    className="show-logs-button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleLogs(deployment.id);
+                    }}
+                  >
+                    {isExpanded ? 'Hide logs' : 'Show logs'}
+                  </button>
+                  {isExpanded && <DeploymentLogs deploymentId={deployment.id} />}
+                </li>
+              );
+            })}
           </ul>
         )}
       </div>
+    </div>
+  );
+}
+
+function DeploymentLogs({ deploymentId }: { deploymentId: string }) {
+  const { logs, loading, error } = useDeploymentLogs(deploymentId);
+
+  if (loading) {
+    return <div className="deployment-logs-loading">Loading logs...</div>;
+  }
+
+  if (error) {
+    return <div className="deployment-logs-error">Error: {error}</div>;
+  }
+
+  if (logs.length === 0) {
+    return <div className="deployment-logs-empty">No logs available</div>;
+  }
+
+  return (
+    <div className="deployment-logs">
+      {logs.map((log, index) => (
+        <div key={index} className={`log-line log-severity-${log.severity.toLowerCase()}`}>
+          <span className="log-timestamp">{new Date(log.timestamp).toLocaleString()}</span>
+          <span className="log-message">{log.message}</span>
+        </div>
+      ))}
     </div>
   );
 }

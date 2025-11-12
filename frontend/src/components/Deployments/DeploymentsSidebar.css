@@ -114,6 +114,26 @@
   border-radius: 8px;
   padding: 1rem;
   transition: box-shadow 0.2s;
+  cursor: pointer;
+  position: relative;
+}
+
+.deployment-item.expanded::after {
+  content: '▼';
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  color: #6c757d;
+  font-size: 0.75rem;
+}
+
+.deployment-item:not(.expanded)::after {
+  content: '▶';
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  color: #6c757d;
+  font-size: 0.75rem;
 }
 
 .deployment-header {
@@ -240,4 +260,87 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 0.5rem;
+}
+
+.show-logs-button {
+  margin-top: 0.75rem;
+  padding: 0;
+  background: none;
+  color: #6c757d;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+  text-decoration: underline;
+  width: auto;
+}
+
+.show-logs-button:hover {
+  color: #495057;
+}
+
+.show-logs-button:focus {
+  outline: none;
+}
+
+.deployment-logs {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  max-height: 400px;
+  overflow-y: auto;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+}
+
+.log-line {
+  display: flex;
+  gap: 1rem;
+  padding: 0.25rem 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.log-line:last-child {
+  border-bottom: none;
+}
+
+.log-timestamp {
+  color: #6c757d;
+  flex-shrink: 0;
+  min-width: 150px;
+}
+
+.log-message {
+  color: #212529;
+  flex: 1;
+}
+
+.log-severity-error,
+.log-severity-fatal {
+  background-color: #fff5f5;
+}
+
+.log-severity-warn,
+.log-severity-warning {
+  background-color: #fffbf0;
+}
+
+.log-severity-info {
+  background-color: #f0f9ff;
+}
+
+.deployment-logs-loading,
+.deployment-logs-error,
+.deployment-logs-empty {
+  margin-top: 1rem;
+  padding: 1rem;
+  text-align: center;
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.deployment-logs-error {
+  color: #dc3545;
 }
