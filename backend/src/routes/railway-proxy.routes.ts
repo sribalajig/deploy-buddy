@@ -6,4 +6,5 @@ export async function railwayProxyRoutes(fastify: FastifyInstance) {
   const controller = container.resolve<RailwayProxyController>('RailwayProxyController');
 
   fastify.get('/api/railway-proxy/project-details', controller.getProjectDetails.bind(controller));
+  fastify.post('/api/railway-proxy/deploy/:environmentId/:serviceId', controller.deployService.bind(controller));
 }
