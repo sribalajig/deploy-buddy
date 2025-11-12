@@ -89,10 +89,8 @@ export function ServicesList({
                     latestDeploymentStatus={status}
                   />
                   <StopButton
-                    serviceId={service.id}
-                    serviceName={service.name}
+                    service={service}
                     onStopSuccess={onRefresh}
-                    deploymentStatus={status}
                   />
                 </div>
               </div>

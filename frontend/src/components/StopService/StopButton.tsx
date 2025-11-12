@@ -2,21 +2,20 @@ import { useState } from 'react';
 import { useStopService } from '../../hooks/useStopService';
 import './StopButton.css';
 import { isNonTerminalState, shouldDisableStop } from '../../utils/deployment-status';
+import type { RailwayService } from '../../types/railway-service';
 
 interface StopButtonProps {
-  serviceId: string;
-  serviceName: string;
+  service: RailwayService;
   onStopSuccess?: () => void;
-  deploymentStatus: string | null;
 }
 
-export function StopButton({ serviceId, serviceName, onStopSuccess, deploymentStatus }: StopButtonProps) {
+export function StopButton({ service, onStopSuccess }: StopButtonProps) {
   const { stopService, loading } = useStopService();
   const [stopStatus, setStopStatus] = useState<string | null>(null);
 
   const handleStop = async (e: React.MouseEvent) => {
     e.stopPropagation(); 
-    const result = await stopService(serviceId);
+    const result = await stopService(service);
     
     if (result.success) {
       setStopStatus('Service stopped successfully');
@@ -28,9 +27,8 @@ export function StopButton({ serviceId, serviceName, onStopSuccess, deploymentSt
     setTimeout(() => setStopStatus(null), 5000);
   };
 
-  const isDisabled = loading || shouldDisableStop(deploymentStatus);
-
-  console.log('deploymentStatus : ', deploymentStatus, 'isDisabled : ', isDisabled);
+  const deploymentStatus = service.latestDeployment?.status ?? null;
+  const isDisabled = loading || shouldDisableStop(deploymentStatus ?? null);
 
   return (
     <div className="stop-button-container">
@@ -43,7 +41,7 @@ export function StopButton({ serviceId, serviceName, onStopSuccess, deploymentSt
             ? 'Service is already removed' 
             : isNonTerminalState(deploymentStatus)
             ? 'Cannot stop service while deployment is in progress'
-            : `Stop ${serviceName}`
+            : `Stop ${service.name}`
         }
       >
         {loading ? 'Stopping...' : 'Stop'}
