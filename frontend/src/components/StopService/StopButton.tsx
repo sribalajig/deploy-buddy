@@ -12,7 +12,8 @@ export function StopButton({ serviceId, serviceName, onStopSuccess }: StopButton
   const { stopService, loading, error } = useStopService();
   const [stopStatus, setStopStatus] = useState<string | null>(null);
 
-  const handleStop = async () => {
+  const handleStop = async (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent event from bubbling to parent
     const result = await stopService(serviceId);
     
     if (result.success) {
@@ -22,7 +23,7 @@ export function StopButton({ serviceId, serviceName, onStopSuccess }: StopButton
     } else {
       setStopStatus(`Failed to stop: ${result.message || 'Unknown error'}`);
     }
-
+  
     // Clear status message after 5 seconds
     setTimeout(() => setStopStatus(null), 5000);
   };
