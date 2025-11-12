@@ -68,18 +68,19 @@ export function ServicesList({
             >
               <div className="service-header">
                 <div className="service-info">
-                  <div className="service-name">{service.name}</div>
-                  <div className="service-id">{service.id}</div>
-                  {status && (
-                    <div className={`service-status status-${status.toLowerCase()}`}>
-                      {status.charAt(0) + status.slice(1).toLowerCase()}
-                    </div>
-                  )}
-                  {lastDeployedAt && (
-                    <div className="service-last-deployed">
-                      Last deployed: {new Date(lastDeployedAt).toLocaleString()}
-                    </div>
-                  )}
+                  <div className="service-meta">
+                    <div className="service-name">{service.name}</div>
+                    {lastDeployedAt && (
+                      <span className="service-last-deployed">
+                        Last deployed: {new Date(lastDeployedAt).toLocaleString()}
+                      </span>
+                    )}
+                    {status && (
+                      <div className={`service-status status-${status.toLowerCase()}`}>
+                        {status.charAt(0) + status.slice(1).toLowerCase()}
+                      </div>
+                    )}
+                  </div>
                 </div>
                 <div className="service-actions">
                   <DeployButton

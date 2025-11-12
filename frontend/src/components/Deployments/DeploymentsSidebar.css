@@ -116,6 +116,20 @@
   transition: box-shadow 0.2s;
 }
 
+.deployment-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.deployment-meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
 .deployment-item:hover {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -211,4 +225,19 @@
 .deployments-sidebar .deployment-status.status-unknown {
   background-color: #e9ecef;
   color: #495057;
+}
+
+.deployment-item.current-deployment {
+  border-color: #007bff;
+  background-color: #e7f3ff;
+  box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
+}
+
+.current-deployment-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #007bff;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.5rem;
 }

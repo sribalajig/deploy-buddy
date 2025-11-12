@@ -47,25 +47,23 @@ export function DeploymentsSidebar({ environment, service, isOpen, onClose }: De
 
         {isOpen && !loading && !error && deployments.length > 0 && (
           <ul className="deployments-list">
-            {deployments.map((deployment) => (
-              <li key={deployment.id} className="deployment-item">
-                <div className={`deployment-status status-${deployment.status?.toLowerCase() || 'unknown'}`}>
-                  {deployment.status ? deployment.status.charAt(0) + deployment.status.slice(1).toLowerCase() : 'Unknown'}
-                </div>
-                <div className="deployment-details">
-                  <div className="deployment-time">
-                    <strong>Created:</strong> {new Date(deployment.createdAt).toLocaleString()}
+            {deployments.map((deployment, index) => (
+              <li key={deployment.id} className={`deployment-item ${index === 0 ? 'current-deployment' : ''}`}>
+                {index === 0 && (
+                  <div className="current-deployment-label">Current deployment</div>
+                )}
+                <div className="deployment-header">
+                  <div className={`deployment-status status-${deployment.status?.toLowerCase() || 'unknown'}`}>
+                    {deployment.status ? deployment.status.charAt(0) + deployment.status.slice(1).toLowerCase() : 'Unknown'}
                   </div>
-                  <div className="deployment-time">
-                    <strong>Updated:</strong> {new Date(deployment.updatedAt).toLocaleString()}
+                  <div className="deployment-meta">
+                    <span className="deployment-time">
+                      Created: {new Date(deployment.createdAt).toLocaleString()}
+                    </span>
+                    <span className="deployment-time">
+                      Updated: {new Date(deployment.updatedAt).toLocaleString()}
+                    </span>
                   </div>
-                  {deployment.staticUrl && (
-                    <div className="deployment-url">
-                      <a href={deployment.staticUrl} target="_blank" rel="noopener noreferrer">
-                        {deployment.staticUrl}
-                      </a>
-                    </div>
-                  )}
                 </div>
               </li>
             ))}
