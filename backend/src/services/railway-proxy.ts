@@ -26,9 +26,7 @@ export class RailwayProxy implements IRailwayProxy {
         try {
             const mutation = `
                 mutation DeployService($environmentId: String!, $serviceId: String!) {
-                    serviceInstanceDeployV2(environmentId: $environmentId, serviceId: $serviceId) {
-                        id
-                    }
+                    serviceInstanceDeployV2(environmentId: $environmentId, serviceId: $serviceId)
                 }
             `;
 

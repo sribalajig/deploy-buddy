@@ -1,4 +1,5 @@
 import type { RailwayService } from '../../types/railway-service';
+import { DeployButton } from '../Deploy/DeployButton';
 import './ServicesList.css';
 
 interface ServicesListProps {
@@ -6,9 +7,16 @@ interface ServicesListProps {
   loading?: boolean;
   error?: string | null;
   onRefresh?: () => void;
+  selectedEnvironmentId?: string | null;
 }
 
-export function ServicesList({ services, loading = false, error = null, onRefresh }: ServicesListProps) {
+export function ServicesList({ 
+  services, 
+  loading = false, 
+  error = null, 
+  onRefresh,
+  selectedEnvironmentId 
+}: ServicesListProps) {
   if (loading) {
     return (
       <div className="services-list-container">
@@ -45,8 +53,17 @@ export function ServicesList({ services, loading = false, error = null, onRefres
       <ul className="services-list">
         {services.map((service) => (
           <li key={service.id} className="service-item">
-            <div className="service-name">{service.name}</div>
-            <div className="service-id">{service.id}</div>
+            <div className="service-header">
+              <div className="service-info">
+                <div className="service-name">{service.name}</div>
+                <div className="service-id">{service.id}</div>
+              </div>
+              <DeployButton
+                serviceId={service.id}
+                serviceName={service.name}
+                environmentId={selectedEnvironmentId}
+              />
+            </div>
           </li>
         ))}
       </ul>
