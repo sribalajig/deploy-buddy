@@ -1,7 +1,7 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { RailwayProxy } from '../services/railway-proxy';
 import { injectable } from 'tsyringe';
-import { DeployServiceParams, RemoveDeploymentParams } from './request-dtos';
+import { DeployServiceParams, GetDeploymentsParams, RemoveDeploymentParams } from './request-dtos';
 
 @injectable()
 export class RailwayProxyController {
@@ -38,9 +38,12 @@ export class RailwayProxyController {
     }
   }
 
-  async getDeployments(request: FastifyRequest<{ Params: DeployServiceParams }>, reply: FastifyReply) {
+  async getDeployments(request: FastifyRequest<{ Params: GetDeploymentsParams }>, reply: FastifyReply) {
     try {
-      const deployments = await this.railwayProxyService.getDeployments(request.params.serviceId);
+      const deployments = await this.railwayProxyService.getDeployments(
+        request.params.environmentId,
+        request.params.serviceId
+      );
       return reply.code(200).send(deployments);
     } catch (error) {
       request.log.error(error);

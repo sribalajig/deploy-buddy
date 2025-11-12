@@ -7,7 +7,7 @@ import { DeployData, DeploymentsData, GraphQLResponse, ProjectData } from '../ut
 interface IRailwayProxy {
     getProjectDetails(): Promise<ProjectDetails>;
     deployService(environmentId: string, serviceId: string): Promise<DeploymentInstance>;
-    getDeployments(serviceId: string, first?: number): Promise<Deployment[]>;
+    getDeployments(environmentId: string, serviceId: string, first?: number): Promise<Deployment[]>;
     removeDeployment(deploymentId: string): Promise<boolean>;
 }
 
@@ -58,11 +58,11 @@ export class RailwayProxy implements IRailwayProxy {
         }
     }
 
-    public async getDeployments(serviceId: string, first: number = 10): Promise<Deployment[]> {
+    public async getDeployments(environmentId: string, serviceId: string, first: number = 10): Promise<Deployment[]> {
         try {
             const query = `
-                query GetDeployments($serviceId: String!, $first: Int!) {
-                    deployments(input: {serviceId: $serviceId}, first: $first) {
+                query GetDeployments($environmentId: String!, $serviceId: String!, $first: Int!) {
+                    deployments(input: {environmentId: $environmentId, serviceId: $serviceId}, first: $first) {
                         edges {
                             node {
                                 id
@@ -82,6 +82,7 @@ export class RailwayProxy implements IRailwayProxy {
             `;
 
             const result = await executeGraphQLQuery(query, {
+                environmentId,
                 serviceId,
                 first,
             });
@@ -105,7 +106,7 @@ export class RailwayProxy implements IRailwayProxy {
             throw error;
         }
     }
-    
+
 
     public async removeDeployment(deploymentId: string): Promise<boolean> {
         try {
@@ -126,7 +127,7 @@ export class RailwayProxy implements IRailwayProxy {
             throw error;
         }
     }
-    
+
     private async getProjectData(): Promise<ProjectDetails> {
         const query = `
             query GetProject($projectId: String!) {
@@ -144,55 +145,30 @@ export class RailwayProxy implements IRailwayProxy {
                             node {
                                 id
                                 name
-                                deployments(first: 1) {
-                                    edges {
-                                        node {
-                                            status
-                                            id
-                                            canRedeploy
-                                            deploymentStopped
-                                            environmentId
-                                            createdAt
-                                            updatedAt
-                                            statusUpdatedAt
-                                        }
-                                    }
-                                }
                             }
                         }
                     }
                 }
             }
         `;
-    
+
         const result = await executeGraphQLQuery(query, {
             projectId: getConfig('RAILWAY_PROJECT_ID'),
         });
-    
+
         const projectData = result.data as ProjectData;
-    
+
         const services: Service[] = projectData?.project?.services?.edges?.map(edge => {
-            const latestDeployment = edge.node.deployments?.edges?.[0]?.node;
             return new Service(
                 edge.node.id,
-                edge.node.name,
-                latestDeployment ? {
-                    id: latestDeployment.id,
-                    status: latestDeployment.status,
-                    canRedeploy: latestDeployment.canRedeploy,
-                    deploymentStopped: latestDeployment.deploymentStopped,
-                    environmentId: latestDeployment.environmentId,
-                    createdAt: latestDeployment.createdAt,
-                    updatedAt: latestDeployment.updatedAt,
-                    statusUpdatedAt: latestDeployment.statusUpdatedAt,
-                } : null
+                edge.node.name
             );
         }) ?? [];
-    
+
         const environments: Environment[] = projectData?.project?.environments?.edges?.map(edge =>
             new Environment(edge.node.id, edge.node.name)
         ) ?? [];
-    
+
         return new ProjectDetails(
             services,
             environments

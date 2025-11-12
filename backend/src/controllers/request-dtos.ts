@@ -5,4 +5,9 @@ export interface DeployServiceParams {
 
 export interface RemoveDeploymentParams {
     deploymentId: string;
-  }
+}
+
+export interface GetDeploymentsParams {
+    environmentId: string;
+    serviceId: string;
+}

@@ -83,6 +83,7 @@ export function ProjectDetails() {
         />
       </div>
       <DeploymentsSidebar
+        environment={selectedEnvironment}
         service={selectedService}
         isOpen={isSidebarOpen}
         onClose={handleSidebarClose}

@@ -9,7 +9,7 @@ interface UseDeploymentsReturn {
   refetch: () => void;
 }
 
-export function useDeployments(serviceId: string | null): UseDeploymentsReturn {
+export function useDeployments(environmentId: string | null, serviceId: string | null): UseDeploymentsReturn {
   const [deployments, setDeployments] = useState<Deployment[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -24,7 +24,7 @@ export function useDeployments(serviceId: string | null): UseDeploymentsReturn {
       setLoading(true);
       setError(null);
       
-      const response = await fetch(`${API_CONFIG.BACKEND_URL}/api/railway-proxy/deployments/${serviceId}`);
+      const response = await fetch(`${API_CONFIG.BACKEND_URL}/api/railway-proxy/deployments/${environmentId}/${serviceId}`);
       
       if (!response.ok) {
         throw new Error(`Failed to fetch deployments: ${response.status} ${response.statusText}`);

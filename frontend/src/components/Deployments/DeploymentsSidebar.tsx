@@ -1,15 +1,18 @@
 import { useDeployments } from '../../hooks/useDeployments';
-import type { RailwayService } from '../../types/railway-service';
+import type { RailwayService, RailwayEnvironment } from '../../types/railway-service';
 import './DeploymentsSidebar.css';
 
 interface DeploymentsSidebarProps {
+  environment: RailwayEnvironment | null;
   service: RailwayService | null;
   isOpen: boolean;
   onClose: () => void;
 }
 
-export function DeploymentsSidebar({ service, isOpen, onClose }: DeploymentsSidebarProps) {
-  const { deployments, loading, error, refetch } = useDeployments(service?.id || null);
+export function DeploymentsSidebar({ environment, service, isOpen, onClose }: DeploymentsSidebarProps) {
+  const { deployments, loading, error, refetch } = useDeployments(
+    environment?.id || null, 
+    service?.id || null);
 
   if (!isOpen) {
     return null;
