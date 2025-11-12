@@ -8,6 +8,7 @@ interface IRailwayProxy {
     getProjectDetails(): Promise<ProjectDetails>;
     deployService(environmentId: string, serviceId: string): Promise<DeploymentInstance>;
     getDeployments(serviceId: string, first?: number): Promise<Deployment[]>;
+    removeDeployment(deploymentId: string): Promise<boolean>;
 }
 
 @injectable()
@@ -101,6 +102,27 @@ export class RailwayProxy implements IRailwayProxy {
             return deployments;
         } catch (error) {
             console.error('Error fetching deployments:', error);
+            throw error;
+        }
+    }
+    
+
+    public async removeDeployment(deploymentId: string): Promise<boolean> {
+        try {
+            const mutation = `
+                mutation RemoveDeployment($id: String!) {
+                    deploymentRemove(id: $id)
+                }
+            `;
+
+            const result = await executeGraphQLQuery(mutation, {
+                id: deploymentId,
+            });
+
+            const removeData = result.data as { deploymentRemove?: boolean };
+            return removeData?.deploymentRemove ?? false;
+        } catch (error) {
+            console.error('Error removing deployment:', error);
             throw error;
         }
     }

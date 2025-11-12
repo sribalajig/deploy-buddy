@@ -77,6 +77,13 @@
   flex: 1;
 }
 
+.service-actions {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  align-items: center;
+}
+
 .service-name {
   font-size: 1.2rem;
   font-weight: 600;

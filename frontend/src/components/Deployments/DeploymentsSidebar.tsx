@@ -25,7 +25,7 @@ export function DeploymentsSidebar({ service, isOpen, onClose }: DeploymentsSide
             ×
           </button>
         </div>
-        
+
         <div className="sidebar-content">
           {loading && (
             <div className="sidebar-loading">Loading deployments...</div>
@@ -48,13 +48,8 @@ export function DeploymentsSidebar({ service, isOpen, onClose }: DeploymentsSide
             <ul className="deployments-list">
               {deployments.map((deployment) => (
                 <li key={deployment.id} className="deployment-item">
-                  <div className="deployment-header">
-                    <div className="deployment-status">
-                      <span className={`status-badge status-${deployment.status.toLowerCase()}`}>
-                        {deployment.status}
-                      </span>
-                    </div>
-                    <div className="deployment-id">{deployment.id.substring(0, 8)}...</div>
+                  <div>
+                    {deployment.status ? deployment.status.charAt(0) + deployment.status.slice(1).toLowerCase() : 'Unknown'}
                   </div>
                   <div className="deployment-details">
                     <div className="deployment-time">

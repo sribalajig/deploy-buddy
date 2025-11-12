@@ -1,7 +1,7 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { RailwayProxy } from '../services/railway-proxy';
 import { injectable } from 'tsyringe';
-import { DeployServiceParams } from './request-dto';
+import { DeployServiceParams, RemoveDeploymentParams } from './request-dtos';
 
 @injectable()
 export class RailwayProxyController {
@@ -45,6 +45,24 @@ export class RailwayProxyController {
     } catch (error) {
       request.log.error(error);
       return reply.code(500).send({ error: 'Failed to fetch deployments' });
+    }
+  }
+
+  async removeDeployment(
+    request: FastifyRequest<{ Params: RemoveDeploymentParams }>,
+    reply: FastifyReply
+  ) {
+    try {
+      const success = await this.railwayProxyService.removeDeployment(request.params.deploymentId);
+      
+      if (!success) {
+        return reply.code(500).send({ error: 'Failed to remove deployment' });
+      }
+
+      return reply.code(200).send({ success: true });
+    } catch (error) {
+      request.log.error(error);
+      return reply.code(500).send({ error: 'Failed to remove deployment' });
     }
   }
 }

@@ -1,5 +1,6 @@
 import type { RailwayService } from '../../types/railway-service';
 import { DeployButton } from '../Deploy/DeployButton';
+import { StopButton } from '../StopService/StopButton';
 import './ServicesList.css';
 
 interface ServicesListProps {
@@ -66,11 +67,18 @@ export function ServicesList({
                 <div className="service-name">{service.name}</div>
                 <div className="service-id">{service.id}</div>
               </div>
-              <DeployButton
-                serviceId={service.id}
-                serviceName={service.name}
-                environmentId={selectedEnvironmentId}
-              />
+              <div className="service-actions">
+                <DeployButton
+                  serviceId={service.id}
+                  serviceName={service.name}
+                  environmentId={selectedEnvironmentId}
+                />
+                <StopButton
+                  serviceId={service.id}
+                  serviceName={service.name}
+                  onStopSuccess={onRefresh}
+                />
+              </div>
             </div>
           </li>
         ))}
