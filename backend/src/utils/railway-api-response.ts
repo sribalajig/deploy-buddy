@@ -62,6 +62,14 @@ export interface DeploymentsData {
     };
 }
 
+export interface DeploymentLogsData {
+    deploymentLogs: Array<{
+        message: string;
+        severity: string;
+        timestamp: string;
+    }>;
+}
+
 interface GraphQLError {
     message: string;
     locations?: Array<{

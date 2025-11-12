@@ -48,3 +48,15 @@ export class Deployment {
         this.staticUrl = staticUrl;
     }
 }
+
+export class DeploymentLog {
+    constructor(
+        public message: string,
+        public severity: string,
+        public timestamp: string
+    ) {
+        this.message = message;
+        this.severity = severity;
+        this.timestamp = timestamp;
+    }
+}

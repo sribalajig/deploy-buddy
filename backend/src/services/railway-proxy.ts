@@ -1,14 +1,15 @@
 import { injectable } from 'tsyringe';
 import { executeGraphQLQuery } from '../utils/http';
 import { getConfig } from '../utils/config';
-import { ProjectDetails, Service, Environment, DeploymentInstance, Deployment } from '../models/railway-proxy';
-import { DeployData, DeploymentsData, GraphQLResponse, ProjectData } from '../utils/railway-api-response';
+import { ProjectDetails, Service, Environment, DeploymentInstance, Deployment, DeploymentLog } from '../models/railway-proxy';
+import { DeployData, DeploymentsData, GraphQLResponse, ProjectData, DeploymentLogsData } from '../utils/railway-api-response';
 
 interface IRailwayProxy {
     getProjectDetails(): Promise<ProjectDetails>;
     deployService(environmentId: string, serviceId: string): Promise<DeploymentInstance>;
     getDeployments(environmentId: string, serviceId: string, first?: number): Promise<Deployment[]>;
     removeDeployment(deploymentId: string): Promise<boolean>;
+    getDeploymentLogs(deploymentId: string, limit?: number): Promise<DeploymentLog[]>;
 }
 
 @injectable()
@@ -126,6 +127,35 @@ export class RailwayProxy implements IRailwayProxy {
         }
     }
 
+    public async getDeploymentLogs(deploymentId: string, limit: number = 100): Promise<DeploymentLog[]> {
+        try {
+            const query = `
+                query GetDeploymentLogs($deploymentId: String!, $limit: Int!) {
+                    deploymentLogs(deploymentId: $deploymentId, limit: $limit) {
+                        message
+                        severity
+                        timestamp
+                    }
+                }
+            `;
+
+            const result = await executeGraphQLQuery(query, {
+                deploymentId,
+                limit,
+            });
+
+            const logsData = result.data as DeploymentLogsData;
+            const logs = logsData?.deploymentLogs?.map(log =>
+                new DeploymentLog(log.message, log.severity, log.timestamp)
+            ) ?? [];
+
+            return logs;
+        } catch (error) {
+            console.error('Error fetching deployment logs:', error);
+            throw error;
+        }
+    }
+
     private async getProjectData(): Promise<ProjectDetails> {
         const query = `
             query GetProject($projectId: String!) {
@@ -165,16 +195,16 @@ export class RailwayProxy implements IRailwayProxy {
         const services: Service[] = await Promise.all(
             (projectData?.project?.services?.edges ?? []).map(async (edge) => {
                 const service = new Service(edge.node.id, edge.node.name);
-                
+
                 if (defaultEnvironmentId) {
                     const latestDeployment = await this.getLatestDeploymentForService(
-                        defaultEnvironmentId, 
-                        edge.node.id, 
+                        defaultEnvironmentId,
+                        edge.node.id,
                         service
                     );
                     service.latestDeployment = latestDeployment ?? undefined;
                 }
-                
+
                 return service;
             })
         );
@@ -189,11 +219,11 @@ export class RailwayProxy implements IRailwayProxy {
         try {
             const deployments = await this.getDeployments(environmentId, serviceId, 1);
             const latest = deployments[0];
-            
+
             if (!latest) {
                 return null;
             }
-            
+
             return new Deployment(
                 latest.id,
                 latest.createdAt,
