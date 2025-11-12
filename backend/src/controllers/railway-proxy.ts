@@ -37,4 +37,14 @@ export class RailwayProxyController {
       return reply.code(500).send({ error: 'Failed to deploy service' });
     }
   }
+
+  async getDeployments(request: FastifyRequest<{ Params: DeployServiceParams }>, reply: FastifyReply) {
+    try {
+      const deployments = await this.railwayProxyService.getDeployments(request.params.serviceId);
+      return reply.code(200).send(deployments);
+    } catch (error) {
+      request.log.error(error);
+      return reply.code(500).send({ error: 'Failed to fetch deployments' });
+    }
+  }
 }

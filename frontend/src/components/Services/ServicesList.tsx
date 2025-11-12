@@ -8,6 +8,8 @@ interface ServicesListProps {
   error?: string | null;
   onRefresh?: () => void;
   selectedEnvironmentId?: string | null;
+  onServiceClick?: (service: RailwayService) => void;
+  selectedServiceId?: string | null;
 }
 
 export function ServicesList({ 
@@ -15,7 +17,9 @@ export function ServicesList({
   loading = false, 
   error = null, 
   onRefresh,
-  selectedEnvironmentId 
+  selectedEnvironmentId,
+  onServiceClick,
+  selectedServiceId
 }: ServicesListProps) {
   if (loading) {
     return (
@@ -52,7 +56,11 @@ export function ServicesList({
     <div className="services-list-container">
       <ul className="services-list">
         {services.map((service) => (
-          <li key={service.id} className="service-item">
+          <li 
+            key={service.id} 
+            className={`service-item ${selectedServiceId === service.id ? 'selected' : ''}`}
+            onClick={() => onServiceClick?.(service)}
+          >
             <div className="service-header">
               <div className="service-info">
                 <div className="service-name">{service.name}</div>

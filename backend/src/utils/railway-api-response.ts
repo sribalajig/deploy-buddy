@@ -27,6 +27,27 @@ export interface DeployData {
     serviceInstanceDeployV2?: string;
 }
 
+interface DeploymentNode {
+    id: string;
+    createdAt: string;
+    updatedAt: string;
+    status: string;
+    statusUpdatedAt: string;
+    staticUrl: string | null;
+    service: {
+        id: string;
+        name: string;
+    };
+}
+
+export interface DeploymentsData {
+    deployments: {
+        edges: Array<{
+            node: DeploymentNode;
+        }>;
+    };
+}
+
 interface GraphQLError {
     message: string;
     locations?: Array<{

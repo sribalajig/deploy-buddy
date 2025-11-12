@@ -25,3 +25,23 @@ export class DeploymentInstance {
         this.success = success;
     }
 }
+
+export class Deployment {
+    constructor(
+        public id: string,
+        public createdAt: string,
+        public updatedAt: string,
+        public status: string,
+        public statusUpdatedAt: string,
+        public staticUrl: string | null,
+        public service: Service
+    ) {
+        this.id = id;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.status = status;
+        this.statusUpdatedAt = statusUpdatedAt;
+        this.staticUrl = staticUrl;
+        this.service = service;
+    }
+}

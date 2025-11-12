@@ -1,65 +1,66 @@
 .project-details-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 2rem;
-  }
-  
-  .project-details-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-    padding-bottom: 1rem;
-    border-bottom: 2px solid #dee2e6;
-  }
-  
-  .project-details-header h1 {
-    margin: 0;
-    color: #212529;
-    font-size: 2rem;
-  }
-  
-  .project-details-actions {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
-  
-  .refresh-button {
-    padding: 0.5rem 1rem;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    transition: background-color 0.2s;
-  }
-  
-  .refresh-button:hover {
-    background-color: #0056b3;
-  }
-  
-  .refresh-button:active {
-    transform: scale(0.98);
-  }
-  
-  .project-details-content {
-    margin-top: 1rem;
-  }
-  
-  .loading,
-  .error,
-  .empty {
-    text-align: center;
-    padding: 2rem;
-    color: #6c757d;
-  }
-  
-  .error {
-    color: #dc3545;
-  }
-  
-  .error p {
-    margin-bottom: 1rem;
-  }
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  position: relative;
+}
+
+.project-details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.project-details-header h1 {
+  margin: 0;
+  color: #212529;
+  font-size: 2rem;
+}
+
+.project-details-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.refresh-button {
+  padding: 0.5rem 1rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+}
+
+.refresh-button:hover {
+  background-color: #0056b3;
+}
+
+.refresh-button:active {
+  transform: scale(0.98);
+}
+
+.project-details-content {
+  margin-top: 1rem;
+}
+
+.loading,
+.error,
+.empty {
+  text-align: center;
+  padding: 2rem;
+  color: #6c757d;
+}
+
+.error {
+  color: #dc3545;
+}
+
+.error p {
+  margin-bottom: 1rem;
+}

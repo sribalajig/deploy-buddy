@@ -1,12 +1,13 @@
 import { injectable } from 'tsyringe';
 import { executeGraphQLQuery } from '../utils/http';
 import { getConfig } from '../utils/config';
-import { ProjectDetails, Service, Environment, DeploymentInstance } from '../models/railway-proxy';
-import { DeployData, GraphQLResponse, ProjectData } from '../utils/railway-api-response';
+import { ProjectDetails, Service, Environment, DeploymentInstance, Deployment } from '../models/railway-proxy';
+import { DeployData, DeploymentsData, GraphQLResponse, ProjectData } from '../utils/railway-api-response';
 
 interface IRailwayProxy {
     getProjectDetails(): Promise<ProjectDetails>;
     deployService(environmentId: string, serviceId: string): Promise<DeploymentInstance>;
+    getDeployments(serviceId: string, first?: number): Promise<Deployment[]>;
 }
 
 @injectable()
@@ -56,7 +57,55 @@ export class RailwayProxy implements IRailwayProxy {
         }
     }
 
-    public async getProjectData(): Promise<ProjectDetails> {
+    public async getDeployments(serviceId: string, first: number = 10): Promise<Deployment[]> {
+        try {
+            const query = `
+                query GetDeployments($serviceId: String!, $first: Int!) {
+                    deployments(input: {serviceId: $serviceId}, first: $first) {
+                        edges {
+                            node {
+                                id
+                                createdAt
+                                updatedAt
+                                status
+                                statusUpdatedAt
+                                staticUrl
+                                service {
+                                    id
+                                    name
+                                }
+                            }
+                        }
+                    }
+                }
+            `;
+
+            const result = await executeGraphQLQuery(query, {
+                serviceId,
+                first,
+            });
+
+            const deploymentsData = result.data as DeploymentsData;
+            const deployments = deploymentsData?.deployments?.edges?.map(edge =>
+                new Deployment(
+                    edge.node.id,
+                    edge.node.createdAt,
+                    edge.node.updatedAt,
+                    edge.node.status,
+                    edge.node.statusUpdatedAt,
+                    edge.node.staticUrl,
+                    new Service(edge.node.service.id, edge.node.service.name)
+                )
+            ) ?? [];
+
+            return deployments;
+        } catch (error) {
+            console.error('Error fetching deployments:', error);
+            throw error;
+        }
+    }
+    
+    private async getProjectData(): Promise<ProjectDetails> {
         const query = `
             query GetProject($projectId: String!) {
                 project(id: $projectId) {

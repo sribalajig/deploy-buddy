@@ -50,12 +50,20 @@
   border: 1px solid #dee2e6;
   border-radius: 8px;
   padding: 1.5rem;
-  transition: box-shadow 0.2s, transform 0.2s;
+  transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s;
+  cursor: pointer;
 }
 
 .service-item:hover {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transform: translateY(-2px);
+  border-color: #007bff;
+}
+
+.service-item.selected {
+  border-color: #007bff;
+  background-color: #e7f3ff;
+  box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
 }
 
 .service-header {
