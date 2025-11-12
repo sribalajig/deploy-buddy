@@ -1,0 +1,83 @@
+.environments-dropdown {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .environments-dropdown-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+    min-width: 200px;
+  }
+  
+  .environments-dropdown-toggle:hover {
+    border-color: #007bff;
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.1);
+  }
+  
+  .environments-label {
+    color: #6c757d;
+    font-weight: 500;
+  }
+  
+  .environments-selected {
+    flex: 1;
+    color: #212529;
+    font-weight: 600;
+    text-align: left;
+  }
+  
+  .environments-arrow {
+    color: #6c757d;
+    font-size: 0.7rem;
+  }
+  
+  .environments-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 998;
+  }
+  
+  .environments-list {
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    z-index: 999;
+    list-style: none;
+    padding: 0.5rem 0;
+    margin: 0;
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    min-width: 200px;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+  
+  .environments-item {
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    color: #212529;
+  }
+  
+  .environments-item:hover {
+    background-color: #f8f9fa;
+  }
+  
+  .environments-item.selected {
+    background-color: #e7f3ff;
+    color: #007bff;
+    font-weight: 600;
+  }

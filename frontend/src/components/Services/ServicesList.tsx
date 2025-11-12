@@ -1,9 +1,14 @@
-import { useRailwayServices } from '../../hooks/useRailwayServices';
+import type { RailwayService } from '../../types/railway-service';
 import './ServicesList.css';
 
-export function ServicesList() {
-  const { services, loading, error, refetch } = useRailwayServices();
+interface ServicesListProps {
+  services: RailwayService[];
+  loading?: boolean;
+  error?: string | null;
+  onRefresh?: () => void;
+}
 
+export function ServicesList({ services, loading = false, error = null, onRefresh }: ServicesListProps) {
   if (loading) {
     return (
       <div className="services-list-container">
@@ -17,9 +22,11 @@ export function ServicesList() {
       <div className="services-list-container">
         <div className="error">
           <p>Error: {error}</p>
-          <button onClick={refetch} className="retry-button">
-            Retry
-          </button>
+          {onRefresh && (
+            <button onClick={onRefresh} className="retry-button">
+              Retry
+            </button>
+          )}
         </div>
       </div>
     );
@@ -35,16 +42,11 @@ export function ServicesList() {
 
   return (
     <div className="services-list-container">
-      <div className="services-header">
-        <h2>Railway Services</h2>
-        <button onClick={refetch} className="refresh-button">
-          Refresh
-        </button>
-      </div>
       <ul className="services-list">
         {services.map((service) => (
           <li key={service.id} className="service-item">
             <div className="service-name">{service.name}</div>
+            <div className="service-id">{service.id}</div>
           </li>
         ))}
       </ul>

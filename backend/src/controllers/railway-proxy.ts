@@ -6,10 +6,10 @@ import { injectable } from 'tsyringe';
 export class RailwayProxyController {
   constructor(private railwayProxyService: RailwayProxy) {}
 
-  async getAvailableServices(request: FastifyRequest, reply: FastifyReply) {
+  async getProjectDetails(request: FastifyRequest, reply: FastifyReply) {
     try {
-      const services = await this.railwayProxyService.getAvailableServices();
-      return reply.code(200).send({ services });
+      const projectDetails = await this.railwayProxyService.getProjectDetails();
+      return reply.code(200).send(projectDetails);
     } catch (error) {
       request.log.error(error);
       return reply.code(500).send({ error: 'Failed to fetch railway services' });

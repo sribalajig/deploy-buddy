@@ -1,9 +1,9 @@
-import { ServicesList } from './components/Services/ServicesList'
+import { ProjectDetails } from './components/ProjectDetails/ProjectDetails'
 
 function App() {
   return (
     <>
-      <ServicesList />
+      <ProjectDetails />
     </>
   )
 }

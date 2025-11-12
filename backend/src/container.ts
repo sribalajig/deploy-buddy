@@ -1,12 +1,11 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
-import RailwayService from './models/railway-service';
 import { RailwayProxy } from './services/railway-proxy';
 import { RailwayProxyController } from './controllers/railway-proxy';
+import { ProjectDetails } from './models/railway-proxy';
 
-// Register dependencies
-container.register('RailwayService', {
-  useValue: new RailwayService('', '')
+container.register('ProjectDetails', {
+  useValue: new ProjectDetails([], [])
 });
 
 container.register('RailwayProxy', RailwayProxy);

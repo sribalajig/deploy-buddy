@@ -1,33 +1,26 @@
-import RailwayService from '../models/railway-service';
 import { injectable } from 'tsyringe';
 import { executeGraphQLQuery } from '../utils/http';
 import { getConfig } from '../utils/config';
-import { GraphQLResponse } from '../models/railway-api-response';
+import { ProjectDetails, Service, Environment } from '../models/railway-proxy';
 
 interface IRailwayProxy {
-    getAvailableServices(): Promise<RailwayService[]>;
+    getProjectDetails(): Promise<ProjectDetails>;
 }
 
 @injectable()
 export class RailwayProxy implements IRailwayProxy {
-    public async getAvailableServices(): Promise<RailwayService[]> {
+    public async getProjectDetails(): Promise<ProjectDetails> {
         try {
-            const data = await this.getProjectData();
-            
-            if (!data?.project?.services) {
-                return [];
-            }
+            const projectData = await this.getProjectData();
 
-            return data.project.services.edges.map(edge => 
-                new RailwayService(edge.node.id, edge.node.name)
-            );
+            return projectData;
         } catch (error) {
             console.error('Error fetching railway services:', error);
             throw error;
         }
-    }    
+    }
 
-    public async getProjectData(): Promise<GraphQLResponse['data']> {
+    public async getProjectData(): Promise<ProjectDetails> {
         const query = `
             query GetProject($projectId: String!) {
                 project(id: $projectId) {
@@ -55,7 +48,18 @@ export class RailwayProxy implements IRailwayProxy {
             projectId: getConfig('RAILWAY_PROJECT_ID'),
         });
 
-        return result.data;
+        const services: Service[] = result.data?.project?.services?.edges?.map(edge => 
+            new Service(edge.node.id, edge.node.name)
+        ) ?? [];
+        
+        const environments: Environment[] = result.data?.project?.environments?.edges?.map(edge => 
+            new Environment(edge.node.id, edge.node.name)
+        ) ?? [];
+
+        return new ProjectDetails(
+            services,
+            environments
+        );
     }
 }
 
