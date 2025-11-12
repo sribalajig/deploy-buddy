@@ -1,10 +1,12 @@
 import { injectable } from 'tsyringe';
 import { executeGraphQLQuery } from '../utils/http';
 import { getConfig } from '../utils/config';
-import { ProjectDetails, Service, Environment } from '../models/railway-proxy';
+import { ProjectDetails, Service, Environment, DeploymentInstance } from '../models/railway-proxy';
+import { DeployData, GraphQLResponse, ProjectData } from '../utils/railway-api-response';
 
 interface IRailwayProxy {
     getProjectDetails(): Promise<ProjectDetails>;
+    deployService(environmentId: string, serviceId: string): Promise<DeploymentInstance>;
 }
 
 @injectable()
@@ -17,6 +19,42 @@ export class RailwayProxy implements IRailwayProxy {
         } catch (error) {
             console.error('Error fetching railway services:', error);
             throw error;
+        }
+    }
+
+    public async deployService(environmentId: string, serviceId: string): Promise<DeploymentInstance> {
+        try {
+            const mutation = `
+                mutation DeployService($environmentId: String!, $serviceId: String!) {
+                    serviceInstanceDeployV2(environmentId: $environmentId, serviceId: $serviceId) {
+                        id
+                    }
+                }
+            `;
+
+            const result: GraphQLResponse = await executeGraphQLQuery(mutation, {
+                environmentId,
+                serviceId,
+            });
+
+            const deployData = result.data as DeployData;
+            const deploymentId = deployData?.serviceInstanceDeployV2;
+
+            if (deploymentId) {
+                return {
+                    deploymentId,
+                    success: true,
+                };
+            }
+
+            return {
+                success: false,
+            };
+        } catch (error) {
+            console.error('Error deploying service:', error);
+            return {
+                success: false,
+            };
         }
     }
 
@@ -48,11 +86,13 @@ export class RailwayProxy implements IRailwayProxy {
             projectId: getConfig('RAILWAY_PROJECT_ID'),
         });
 
-        const services: Service[] = result.data?.project?.services?.edges?.map(edge => 
+        const projectData = result.data as ProjectData;
+
+        const services: Service[] = projectData?.project?.services?.edges?.map(edge =>
             new Service(edge.node.id, edge.node.name)
         ) ?? [];
-        
-        const environments: Environment[] = result.data?.project?.environments?.edges?.map(edge => 
+
+        const environments: Environment[] = projectData?.project?.environments?.edges?.map(edge =>
             new Environment(edge.node.id, edge.node.name)
         ) ?? [];
 

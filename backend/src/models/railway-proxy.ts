@@ -18,3 +18,10 @@ export class Service {
         this.name = name;
     }
 }
+
+export class DeploymentInstance {
+    constructor(public deploymentId?: string, public success?: boolean) {
+        this.deploymentId = deploymentId;
+        this.success = success;
+    }
+}

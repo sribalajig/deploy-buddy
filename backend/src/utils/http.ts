@@ -1,5 +1,5 @@
 import { getConfig } from "./config";
-import { GraphQLResponse } from "../models/railway-api-response";
+import { GraphQLResponse } from "./railway-api-response";
 
 export async function executeGraphQLQuery(
     query: string, 
