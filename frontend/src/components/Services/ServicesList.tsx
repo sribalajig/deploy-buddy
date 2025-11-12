@@ -86,7 +86,7 @@ export function ServicesList({
                     serviceId={service.id}
                     serviceName={service.name}
                     environmentId={selectedEnvironmentId ?? null}
-                    deploymentStatus={status}
+                    latestDeploymentStatus={status}
                   />
                   <StopButton
                     serviceId={service.id}

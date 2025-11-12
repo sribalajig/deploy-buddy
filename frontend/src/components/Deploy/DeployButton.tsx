@@ -1,15 +1,16 @@
 import { useState } from 'react';
 import { useDeployService } from '../../hooks/useDeployService';
 import './DeployButton.css';
+import { shouldDisableStart } from '../../utils/deployment-status';
 
 interface DeployButtonProps {
   serviceId: string;
   serviceName: string;
   environmentId: string | null;
-  deploymentStatus: string | null;
+  latestDeploymentStatus: string | null;
 }
 
-export function DeployButton({ serviceId, serviceName, environmentId }: DeployButtonProps) {
+export function DeployButton({ serviceId, serviceName, environmentId, latestDeploymentStatus }: DeployButtonProps) {
   const { deploy, loading } = useDeployService();
   const [deploymentStatus, setDeploymentStatus] = useState<string | null>(null);
 
@@ -32,7 +33,7 @@ export function DeployButton({ serviceId, serviceName, environmentId }: DeployBu
     setTimeout(() => setDeploymentStatus(null), 5000);
   };
 
-  const isDisabled = loading || deploymentStatus?.toLowerCase() === 'success';
+  const isDisabled = loading || shouldDisableStart(latestDeploymentStatus);
 
   return (
     <div className="deploy-button-container">
