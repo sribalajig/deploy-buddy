@@ -5,5 +5,5 @@ import { RailwayProxyController } from '../controllers/railway-proxy';
 export async function railwayProxyRoutes(fastify: FastifyInstance) {
   const controller = container.resolve<RailwayProxyController>('RailwayProxyController');
 
-  fastify.get('/railway-proxy/available-services', controller.getAvailableServices.bind(controller));
+  fastify.get('/api/railway-proxy/services', controller.getAvailableServices.bind(controller));
 }

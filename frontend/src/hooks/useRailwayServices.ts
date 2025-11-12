@@ -19,7 +19,7 @@ export function useRailwayServices(): UseRailwayServicesReturn {
       setLoading(true);
       setError(null);
       
-      const response = await fetch(`${API_CONFIG.BACKEND_URL}/railway-proxy/available-services`);
+      const response = await fetch(`${API_CONFIG.BACKEND_URL}/api/railway-proxy/services`);
       
       if (!response.ok) {
         throw new Error(`Failed to fetch services: ${response.status} ${response.statusText}`);

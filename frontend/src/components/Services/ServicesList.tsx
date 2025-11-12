@@ -45,7 +45,6 @@ export function ServicesList() {
         {services.map((service) => (
           <li key={service.id} className="service-item">
             <div className="service-name">{service.name}</div>
-            <div className="service-id">{service.id}</div>
           </li>
         ))}
       </ul>
