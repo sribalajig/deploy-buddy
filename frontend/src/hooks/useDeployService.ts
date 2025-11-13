@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { API_CONFIG } from '../utils/config';
+import { isTerminalState } from '../utils/deployment-status';
 
 interface DeployResponse {
   deploymentId?: string;
@@ -7,8 +8,13 @@ interface DeployResponse {
   message?: string;
 }
 
+interface DeploymentStatusUpdate {
+  status?: string;
+  error?: string;
+}
+
 interface UseDeployServiceReturn {
-  deploy: (environmentId: string, serviceId: string) => Promise<DeployResponse>;
+  deploy: (environmentId: string, serviceId: string, onStatusUpdate?: (status: string) => void) => Promise<DeployResponse>;
   loading: boolean;
   error: string | null;
 }
@@ -16,11 +22,20 @@ interface UseDeployServiceReturn {
 export function useDeployService(): UseDeployServiceReturn {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const eventSourceRef = useRef<EventSource | null>(null);
 
-  const deploy = async (environmentId: string, serviceId: string): Promise<DeployResponse> => {
+  const deploy = useCallback(async (
+    environmentId: string, 
+    serviceId: string,
+    onStatusUpdate?: (status: string) => void
+  ): Promise<DeployResponse> => {
     try {
       setLoading(true);
       setError(null);
+
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+      }
 
       const response = await fetch(
         `${API_CONFIG.BACKEND_URL}/api/railway-proxy/deploy/${environmentId}/${serviceId}`,
@@ -34,6 +49,45 @@ export function useDeployService(): UseDeployServiceReturn {
       }
 
       const data: DeployResponse = await response.json();
+      
+      if (data.success && data.deploymentId && onStatusUpdate) {
+        const eventSource = new EventSource(
+          `${API_CONFIG.BACKEND_URL}/api/railway-proxy/deployments/${data.deploymentId}/status/${environmentId}/${serviceId}`
+        );
+
+        eventSourceRef.current = eventSource;
+
+        eventSource.onmessage = (event) => {
+          try {
+            const update: DeploymentStatusUpdate = JSON.parse(event.data);
+            
+            if (update.error) {
+              console.error('Deployment status error:', update.error);
+              eventSource.close();
+              eventSourceRef.current = null;
+              return;
+            }
+
+            if (update.status) {
+              onStatusUpdate(update.status);
+
+              if (isTerminalState(update.status)) {
+                eventSource.close();
+                eventSourceRef.current = null;
+              }
+            }
+          } catch (err) {
+            console.error('Error parsing deployment status:', err);
+          }
+        };
+
+        eventSource.onerror = (err) => {
+          console.error('EventSource error:', err);
+          eventSource.close();
+          eventSourceRef.current = null;
+        };
+      }
+
       return data;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
@@ -45,7 +99,7 @@ export function useDeployService(): UseDeployServiceReturn {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   return {
     deploy,

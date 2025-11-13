@@ -17,6 +17,8 @@ const corsOrigins = getConfig('CORS_ORIGINS')
     origin: corsOrigins.length > 0 ? corsOrigins : true,
     methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type'],
+    credentials: true,
+    exposedHeaders: ['Content-Type', 'Cache-Control', 'Connection'],
   });
 
 fastify.register(railwayProxyRoutes);

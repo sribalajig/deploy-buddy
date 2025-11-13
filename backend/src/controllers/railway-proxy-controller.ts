@@ -2,10 +2,15 @@ import { FastifyRequest, FastifyReply } from 'fastify';
 import { RailwayProxy } from '../services/railway-proxy';
 import { injectable } from 'tsyringe';
 import { DeployServiceParams, GetDeploymentsParams, RemoveDeploymentParams, GetDeploymentLogsParams } from './request-dtos';
+import { DeploymentStreamingService } from '../services/deployment-streaming';
+import { ISSEStream, IClientConnection } from '../utils/sse-stream';
 
 @injectable()
 export class RailwayProxyController {
-  constructor(private railwayProxyService: RailwayProxy) { }
+  constructor(
+    private railwayProxyService: RailwayProxy,
+    private deploymentStreamingService: DeploymentStreamingService
+  ) { }
 
   async getProjectDetails(request: FastifyRequest, reply: FastifyReply) {
     try {
@@ -36,6 +41,51 @@ export class RailwayProxyController {
       request.log.error(error);
       return reply.code(500).send({ error: 'Failed to deploy service' });
     }
+  }
+
+  async streamDeploymentStatus(
+    request: FastifyRequest<{ 
+      Params: { deploymentId: string; environmentId: string; serviceId: string } 
+    }>,
+    reply: FastifyReply
+  ) {
+    try {
+      const origin = request.headers.origin;
+      if (origin) {
+        reply.raw.setHeader('Access-Control-Allow-Origin', origin);
+        reply.raw.setHeader('Access-Control-Allow-Credentials', 'true');
+      }
+
+      const stream = this.createSSEStream(reply);
+      const connection = this.createClientConnection(request);
+
+      await this.deploymentStreamingService.streamDeploymentStatus(
+        request.params.deploymentId,
+        request.params.environmentId,
+        request.params.serviceId,
+        stream,
+        connection
+      );
+    } catch (error) {
+      request.log.error(error);
+      reply.code(500).send({ error: 'Failed to stream deployment status' });
+    }
+  }
+
+  private createSSEStream(reply: FastifyReply): ISSEStream {
+    return {
+      write: (data: string) => reply.raw.write(data),
+      end: () => reply.raw.end(),
+      setHeader: (name: string, value: string) => reply.raw.setHeader(name, value)
+    };
+  }
+
+  private createClientConnection(request: FastifyRequest): IClientConnection {
+    return {
+      onDisconnect: (callback: () => void) => {
+        request.raw.on('close', callback);
+      }
+    };
   }
 
   async getDeployments(request: FastifyRequest<{ Params: GetDeploymentsParams }>, reply: FastifyReply) {

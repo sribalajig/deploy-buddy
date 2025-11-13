@@ -7,6 +7,7 @@ export async function railwayProxyRoutes(fastify: FastifyInstance) {
 
   fastify.get('/api/railway-proxy/project-details', controller.getProjectDetails.bind(controller));
   fastify.post('/api/railway-proxy/deploy/:environmentId/:serviceId', controller.deployService.bind(controller));
+  fastify.get('/api/railway-proxy/deployments/:deploymentId/status/:environmentId/:serviceId', controller.streamDeploymentStatus.bind(controller));
   fastify.get('/api/railway-proxy/deployments/:environmentId/:serviceId', controller.getDeployments.bind(controller));
   fastify.get('/api/railway-proxy/deployments/:deploymentId/logs', controller.getDeploymentLogs.bind(controller));
   fastify.delete('/api/railway-proxy/deployments/:deploymentId', controller.removeDeployment.bind(controller));
