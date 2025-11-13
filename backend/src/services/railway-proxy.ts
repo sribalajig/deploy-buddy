@@ -132,9 +132,14 @@ export class RailwayProxy implements IRailwayProxy {
 
         const projectData = result.data as ProjectData;
 
-        const environments: Environment[] = projectData?.project?.environments?.edges?.map(edge =>
+        // Filter to only include "production" environment
+        const allEnvironments: Environment[] = projectData?.project?.environments?.edges?.map(edge =>
             new Environment(edge.node.id, edge.node.name)
         ) ?? [];
+        
+        const environments: Environment[] = allEnvironments.filter(
+            env => env.name.toLowerCase() === 'production'
+        );
 
         const defaultEnvironmentId = environments[0]?.id;
 

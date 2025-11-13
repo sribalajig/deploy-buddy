@@ -81,3 +81,14 @@
     color: #007bff;
     font-weight: 600;
   }
+
+.environments-dropdown-toggle.disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  background-color: #f8f9fa;
+}
+
+.environments-dropdown-toggle.disabled:hover {
+  border-color: #dee2e6;
+  box-shadow: none;
+}

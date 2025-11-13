@@ -14,6 +14,7 @@ export function EnvironmentsDropdown({
   onEnvironmentChange,
 }: EnvironmentsDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const isSingleEnvironment = environments.length === 1;
 
   const handleSelect = (environment: RailwayEnvironment) => {
     onEnvironmentChange(environment);
@@ -27,16 +28,19 @@ export function EnvironmentsDropdown({
   return (
     <div className="environments-dropdown">
       <button
-        className="environments-dropdown-toggle"
-        onClick={() => setIsOpen(!isOpen)}
+        className={`environments-dropdown-toggle ${isSingleEnvironment ? 'disabled' : ''}`}
+        onClick={() => !isSingleEnvironment && setIsOpen(!isOpen)}
         aria-expanded={isOpen}
+        disabled={isSingleEnvironment}
       >
         <span className="environments-selected">
-          {selectedEnvironment?.name || 'Select environment'}
+          {selectedEnvironment?.name || environments[0]?.name || 'Select environment'}
         </span>
-        <span className="environments-arrow">{isOpen ? '▲' : '▼'}</span>
+        {!isSingleEnvironment && (
+          <span className="environments-arrow">{isOpen ? '▲' : '▼'}</span>
+        )}
       </button>
-      {isOpen && (
+      {isOpen && !isSingleEnvironment && (
         <>
           <div className="environments-overlay" onClick={() => setIsOpen(false)} />
           <ul className="environments-list">
