@@ -14,7 +14,7 @@ interface DeploymentsSidebarProps {
 export interface DeploymentsSidebarRef {
   refetch: () => void;
   upsertDeployment: (deployment: Deployment) => void;
-  fetchDeployment: (deploymentId: string, environmentId: string, serviceId: string) => Promise<void>;
+  fetchDeployment: (deploymentId: string, environmentId: string, serviceId: string, onFetched?: (deployment: Deployment) => void) => Promise<void>;
 }
 
 export const DeploymentsSidebar = forwardRef<DeploymentsSidebarRef, DeploymentsSidebarProps>(

@@ -4,7 +4,7 @@ import { ServicesList } from '../Services/ServicesList';
 import { EnvironmentsDropdown } from '../Environments/EnvironmentsDropdown';
 import { DeploymentsSidebar } from '../Deployments/DeploymentsSidebar';
 import type { DeploymentsSidebarRef } from '../Deployments/DeploymentsSidebar';
-import type { RailwayEnvironment, RailwayService } from '../../types/railway-service';
+import type { RailwayEnvironment, RailwayService, Deployment } from '../../types/railway-service';
 import './ProjectDetails.css';
 
 export function ProjectDetails() {
@@ -12,7 +12,14 @@ export function ProjectDetails() {
   const [selectedEnvironment, setSelectedEnvironment] = useState<RailwayEnvironment | null>(null);
   const [selectedService, setSelectedService] = useState<RailwayService | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
+  const [services, setServices] = useState<RailwayService[]>([]);
   const sidebarRef = useRef<DeploymentsSidebarRef>(null);
+
+  useEffect(() => {
+    if (projectDetails?.services) {
+      setServices(projectDetails.services);
+    }
+  }, [projectDetails]);
 
   useEffect(() => {
     if (projectDetails?.environments && projectDetails.environments.length > 0 && !selectedEnvironment) {
@@ -43,7 +50,36 @@ export function ProjectDetails() {
 
   const handleDeploymentUpdate = (deploymentId: string) => {
     if (selectedEnvironment?.id && selectedService?.id) {
-      sidebarRef.current?.fetchDeployment(deploymentId, selectedEnvironment.id, selectedService.id);
+      sidebarRef.current?.fetchDeployment(
+        deploymentId, 
+        selectedEnvironment.id, 
+        selectedService.id,
+        (deployment: Deployment) => {
+          setServices(prev => prev.map(service => {
+            if (service.id === selectedService.id) {
+              const currentLatest = service.latestDeployment;
+              if (!currentLatest || 
+                  deployment.id === currentLatest.id || 
+                  new Date(deployment.updatedAt) > new Date(currentLatest.updatedAt)) {
+                return {
+                  ...service,
+                  latestDeployment: {
+                    id: deployment.id,
+                    status: deployment.status,
+                    canRedeploy: currentLatest?.canRedeploy ?? false,
+                    deploymentStopped: currentLatest?.deploymentStopped ?? false,
+                    environmentId: selectedEnvironment.id,
+                    createdAt: deployment.createdAt,
+                    updatedAt: deployment.updatedAt,
+                    statusUpdatedAt: deployment.statusUpdatedAt,
+                  }
+                };
+              }
+            }
+            return service;
+          }));
+        }
+      );
     }
   };
 
@@ -93,7 +129,7 @@ export function ProjectDetails() {
       <div className="project-details-layout">
         <div className="project-details-content">
           <ServicesList
-            services={projectDetails.services}
+            services={services}
             loading={loading}
             error={error}
             onRefresh={refetch}

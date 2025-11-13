@@ -8,7 +8,7 @@ interface UseDeploymentsReturn {
   error: string | null;
   refetch: () => void;
   upsertDeployment: (deployment: Deployment) => void;
-  fetchDeployment: (deploymentId: string, environmentId: string, serviceId: string) => Promise<void>;
+  fetchDeployment: (deploymentId: string, environmentId: string, serviceId: string, onFetched?: (deployment: Deployment) => void) => Promise<void>;
 }
 
 export function useDeployments(environmentId: string | null, serviceId: string | null): UseDeploymentsReturn {
@@ -42,7 +42,7 @@ export function useDeployments(environmentId: string | null, serviceId: string |
     }
   };
 
-  const fetchDeployment = async (deploymentId: string, environmentId: string, serviceId: string) => {
+  const fetchDeployment = async (deploymentId: string, environmentId: string, serviceId: string, onFetched?: (deployment: Deployment) => void) => {
     try {
       const response = await fetch(
         `${API_CONFIG.BACKEND_URL}/api/railway-proxy/deployments/${deploymentId}/${environmentId}/${serviceId}`
@@ -57,6 +57,7 @@ export function useDeployments(environmentId: string | null, serviceId: string |
       
       const deployment: Deployment = await response.json();
       upsertDeployment(deployment);
+      onFetched?.(deployment);
     } catch (err) {
       console.error('Error fetching deployment:', err);
     }
