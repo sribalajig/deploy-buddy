@@ -91,6 +91,7 @@ export function ServicesList({
 
   return (
     <div className="services-list-container">
+      <h2 className="services-heading">Services</h2>
       <ul className="services-list">
         {services.map((service) => {
           const status = serviceStatuses[service.id] ?? service.latestDeployment?.status ?? null;

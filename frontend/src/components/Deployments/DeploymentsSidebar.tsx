@@ -38,10 +38,10 @@ export const DeploymentsSidebar = forwardRef<DeploymentsSidebarRef, DeploymentsS
     return (
       <div className={`deployments-sidebar ${isOpen ? 'open' : 'closed'}`}>
         <div className="sidebar-header">
-          <h2>{service?.name || 'Deployments'}</h2>
-          <button className="sidebar-close" onClick={onClose} aria-label="Close sidebar">
-            ×
-          </button>
+          <div className="sidebar-title">
+            <h2>Deployments</h2>
+            {service?.name && <span className="sidebar-service-name">{service.name}</span>}
+          </div>
         </div>
 
         <div className="sidebar-content">
@@ -72,9 +72,6 @@ export const DeploymentsSidebar = forwardRef<DeploymentsSidebarRef, DeploymentsS
                 const isExpanded = expandedDeploymentId === deployment.id;
                 return (
                   <li key={deployment.id} className={`deployment-item ${index === 0 ? 'current-deployment' : ''}`}>
-                    {index === 0 && (
-                      <div className="current-deployment-label">Current deployment</div>
-                    )}
                     <div className="deployment-header">
                       <div className={`deployment-status status-${deployment.status?.toLowerCase() || 'unknown'}`}>
                         {formatStatusDisplay(deployment.status)}

@@ -2,6 +2,13 @@
   max-width: 100%;
 }
 
+.services-heading {
+  margin: 0 0 1.5rem 0;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #212529;
+}
+
 .services-header {
   display: flex;
   justify-content: space-between;
@@ -61,9 +68,9 @@
 }
 
 .service-item.selected {
-  border-color: #007bff;
-  background-color: #e7f3ff;
-  box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
+  border-color: #adb5bd;
+  background-color: #e9ecef;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .service-header {
@@ -94,8 +101,8 @@
 }
 
 .service-name {
-  font-size: 1.2rem;
-  font-weight: 600;
+  font-size: 1rem;
+  font-weight: 500;
   color: #212529;
 }
 
@@ -122,6 +129,8 @@
 .service-status.status-complete {
   background-color: #d4edda;
   color: #155724;
+  font-weight: bold;
+  border: 2px solid #155724;
 }
 
 .service-status.status-failed,

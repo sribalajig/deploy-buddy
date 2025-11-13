@@ -50,31 +50,22 @@
   z-index: 1;
 }
 
+.sidebar-title {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
 .sidebar-header h2 {
   margin: 0;
   font-size: 1.5rem;
+  font-weight: bold;
   color: #212529;
 }
 
-.sidebar-close {
-  background: none;
-  border: none;
-  font-size: 2rem;
-  line-height: 1;
-  color: #6c757d;
-  cursor: pointer;
-  padding: 0;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 4px;
-  transition: background-color 0.2s, color 0.2s;
-}
-
-.sidebar-close:hover {
-  background-color: #dee2e6;
+.sidebar-service-name {
+  font-size: 1rem;
+  font-weight: 500;
   color: #212529;
 }
 
@@ -222,6 +213,8 @@
 .deployments-sidebar .deployment-status.status-complete {
   background-color: #d4edda;
   color: #155724;
+  font-weight: bold;
+  border: 2px solid #155724;
 }
 
 .deployments-sidebar .deployment-status.status-failed,
@@ -248,18 +241,9 @@
 }
 
 .deployment-item.current-deployment {
-  border-color: #007bff;
-  background-color: #e7f3ff;
-  box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
-}
-
-.current-deployment-label {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #007bff;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 0.5rem;
+  border-color: #adb5bd;
+  background-color: #e9ecef;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .show-logs-button {
