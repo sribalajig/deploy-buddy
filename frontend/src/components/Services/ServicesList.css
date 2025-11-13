@@ -24,18 +24,19 @@
 .refresh-button,
 .retry-button {
   padding: 0.5rem 1rem;
-  background-color: #007bff;
-  color: white;
-  border: none;
+  background-color: #f8f9fa;
+  color: #212529;
+  border: 1px solid #dee2e6;
   border-radius: 4px;
   cursor: pointer;
   font-size: 0.9rem;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s, border-color 0.2s;
 }
 
 .refresh-button:hover,
 .retry-button:hover {
-  background-color: #0056b3;
+  background-color: #e9ecef;
+  border-color: #adb5bd;
 }
 
 .refresh-button:active,
