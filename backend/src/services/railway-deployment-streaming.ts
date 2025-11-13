@@ -59,9 +59,7 @@ export class DeploymentStreamingService implements IDeploymentStreamingService {
     serviceId: string,
     stream: ISSEStream
   ): NodeJS.Timeout {
-    let pollInterval: NodeJS.Timeout;
-    
-    pollInterval = setInterval(async () => {
+    const pollInterval = setInterval(async () => {
       const deployment = await this.findDeployment(
         deploymentId,
         environmentId,

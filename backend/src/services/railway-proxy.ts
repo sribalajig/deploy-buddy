@@ -146,7 +146,6 @@ export class RailwayProxy implements IRailwayProxy {
                     const latestDeployment = await this.getLatestDeploymentForService(
                         defaultEnvironmentId,
                         edge.node.id,
-                        service
                     );
                     service.latestDeployment = latestDeployment ?? undefined;
                 }
@@ -161,7 +160,7 @@ export class RailwayProxy implements IRailwayProxy {
         );
     }
 
-    private async getLatestDeploymentForService(environmentId: string, serviceId: string, service: Service): Promise<Deployment | null> {
+    private async getLatestDeploymentForService(environmentId: string, serviceId: string): Promise<Deployment | null> {
         try {
             const deployments = await this.getDeployments(environmentId, serviceId, 1);
             const latest = deployments[0];
