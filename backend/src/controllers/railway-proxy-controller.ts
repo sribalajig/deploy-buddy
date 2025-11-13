@@ -1,7 +1,7 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { RailwayProxy } from '../services/railway-proxy';
 import { injectable } from 'tsyringe';
-import { DeployServiceParams, GetDeploymentsParams, RemoveDeploymentParams, GetDeploymentLogsParams } from './request-dtos';
+import { DeployServiceParams, GetDeploymentsParams, RemoveDeploymentParams, GetDeploymentLogsParams, GetDeploymentParams } from './request-dtos';
 import { DeploymentStreamingService } from '../services/deployment-streaming';
 import { ISSEStream, IClientConnection } from '../utils/sse-stream';
 
@@ -133,6 +133,28 @@ export class RailwayProxyController {
     } catch (error) {
       request.log.error(error);
       return reply.code(500).send({ error: 'Failed to fetch deployment logs' });
+    }
+  }
+
+  async getDeployment(
+    request: FastifyRequest<{ Params: GetDeploymentParams }>,
+    reply: FastifyReply
+  ) {
+    try {
+      const deployment = await this.railwayProxyService.getDeployment(
+        request.params.deploymentId,
+        request.params.environmentId,
+        request.params.serviceId
+      );
+      
+      if (!deployment) {
+        return reply.code(404).send({ error: 'Deployment not found' });
+      }
+      
+      return reply.code(200).send(deployment);
+    } catch (error) {
+      request.log.error(error);
+      return reply.code(500).send({ error: 'Failed to fetch deployment' });
     }
   }
 }

@@ -9,7 +9,7 @@ interface StopButtonProps {
   environmentId: string | null;
   latestDeploymentStatus: string | null;
   latestDeploymentId: string | null;
-  onStatusUpdate?: (status: string) => void;
+  onStatusUpdate?: (status: string, deploymentId?: string) => void;
   onStreamClosed?: () => void;
   onStopStart?: () => void;
 }
@@ -52,7 +52,7 @@ export function StopButton({
 
     const result = await stopService(environmentId, serviceId, latestDeploymentId, (status: string) => {
       setCurrentStatus(status);
-      onStatusUpdate?.(status);
+      onStatusUpdate?.(status, latestDeploymentId);
       if (isTerminalState(status)) {
         setIsStoppingState(false);
         onStreamClosed?.();

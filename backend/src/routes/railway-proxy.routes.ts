@@ -11,4 +11,5 @@ export async function railwayProxyRoutes(fastify: FastifyInstance) {
   fastify.get('/api/railway-proxy/deployments/:environmentId/:serviceId', controller.getDeployments.bind(controller));
   fastify.get('/api/railway-proxy/deployments/:deploymentId/logs', controller.getDeploymentLogs.bind(controller));
   fastify.delete('/api/railway-proxy/deployments/:deploymentId', controller.removeDeployment.bind(controller));
+  fastify.get('/api/railway-proxy/deployments/:deploymentId/:environmentId/:serviceId', controller.getDeployment.bind(controller));
 }

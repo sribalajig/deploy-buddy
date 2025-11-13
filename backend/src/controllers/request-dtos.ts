@@ -15,3 +15,9 @@ export interface GetDeploymentsParams {
 export interface GetDeploymentLogsParams {
     deploymentId: string;
 }
+
+export interface GetDeploymentParams {
+    deploymentId: string;
+    environmentId: string;
+    serviceId: string;
+}

@@ -8,6 +8,7 @@ interface IRailwayProxy {
     getProjectDetails(): Promise<ProjectDetails>;
     deployService(environmentId: string, serviceId: string): Promise<DeploymentInstance>;
     getDeployments(environmentId: string, serviceId: string, first?: number): Promise<Deployment[]>;
+    getDeployment(deploymentId: string, environmentId: string, serviceId: string): Promise<Deployment | null>;
     removeDeployment(deploymentId: string): Promise<boolean>;
     getDeploymentLogs(deploymentId: string, limit?: number): Promise<DeploymentLog[]>;
 }
@@ -152,6 +153,16 @@ export class RailwayProxy implements IRailwayProxy {
             return logs;
         } catch (error) {
             console.error('Error fetching deployment logs:', error);
+            throw error;
+        }
+    }
+
+    public async getDeployment(deploymentId: string, environmentId: string, serviceId: string): Promise<Deployment | null> {
+        try {
+            const deployments = await this.getDeployments(environmentId, serviceId, 10);
+            return deployments.find(d => d.id === deploymentId) || null;
+        } catch (error) {
+            console.error('Error fetching deployment:', error);
             throw error;
         }
     }

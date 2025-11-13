@@ -7,6 +7,8 @@ interface UseDeploymentsReturn {
   loading: boolean;
   error: string | null;
   refetch: () => void;
+  upsertDeployment: (deployment: Deployment) => void;
+  fetchDeployment: (deploymentId: string, environmentId: string, serviceId: string) => Promise<void>;
 }
 
 export function useDeployments(environmentId: string | null, serviceId: string | null): UseDeploymentsReturn {
@@ -40,6 +42,44 @@ export function useDeployments(environmentId: string | null, serviceId: string |
     }
   };
 
+  const fetchDeployment = async (deploymentId: string, environmentId: string, serviceId: string) => {
+    try {
+      const response = await fetch(
+        `${API_CONFIG.BACKEND_URL}/api/railway-proxy/deployments/${deploymentId}/${environmentId}/${serviceId}`
+      );
+      
+      if (!response.ok) {
+        if (response.status === 404) {
+          return;
+        }
+        throw new Error(`Failed to fetch deployment: ${response.status} ${response.statusText}`);
+      }
+      
+      const deployment: Deployment = await response.json();
+      upsertDeployment(deployment);
+    } catch (err) {
+      console.error('Error fetching deployment:', err);
+    }
+  };
+
+  const upsertDeployment = (deployment: Deployment) => {
+    setDeployments(prev => {
+      const existingIndex = prev.findIndex(d => d.id === deployment.id);
+      
+      if (existingIndex >= 0) {
+        const updated = [...prev];
+        updated[existingIndex] = deployment;
+        return updated.sort((a, b) => 
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+      } else {
+        return [deployment, ...prev].sort((a, b) => 
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+      }
+    });
+  };
+
   useEffect(() => {
     fetchDeployments();
   }, [serviceId]);
@@ -49,5 +89,7 @@ export function useDeployments(environmentId: string | null, serviceId: string |
     loading,
     error,
     refetch: fetchDeployments,
+    upsertDeployment,
+    fetchDeployment,
   };
 }

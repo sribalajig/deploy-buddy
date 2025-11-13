@@ -10,6 +10,7 @@ interface ServicesListProps {
   error?: string | null;
   onRefresh?: () => void;
   onSidebarRefresh?: () => void;
+  onDeploymentUpdate?: (deploymentId: string) => void;
   selectedEnvironmentId?: string | null;
   onServiceClick?: (service: RailwayService) => void;
   selectedServiceId?: string | null;
@@ -23,9 +24,11 @@ export function ServicesList({
   onSidebarRefresh,
   selectedEnvironmentId,
   onServiceClick,
-  selectedServiceId
+  selectedServiceId,
+  onDeploymentUpdate
 }: ServicesListProps) {
   const [serviceStatuses, setServiceStatuses] = useState<Record<string, string | null>>({});
+  const [activeDeploymentIds, setActiveDeploymentIds] = useState<Record<string, string | null>>({});
 
   useEffect(() => {
     const initialStatuses: Record<string, string | null> = {};
@@ -44,6 +47,13 @@ export function ServicesList({
       setTimeout(() => {
         onSidebarRefresh();
       }, 500);
+    }
+  };
+
+  const handleStatusUpdate = (serviceId: string, status: string | null, deploymentId?: string) => {
+    updateServiceStatus(serviceId, status);
+    if (deploymentId && onDeploymentUpdate) {
+      onDeploymentUpdate(deploymentId);
     }
   };
 
@@ -113,9 +123,17 @@ export function ServicesList({
                     serviceName={service.name}
                     environmentId={selectedEnvironmentId ?? null}
                     latestDeploymentStatus={status}
-                    onStatusUpdate={(newStatus) => updateServiceStatus(service.id, newStatus)}
+                    onStatusUpdate={(newStatus, deploymentId) => {
+                      const idToUse = deploymentId || activeDeploymentIds[service.id];
+                      handleStatusUpdate(service.id, newStatus, idToUse || undefined);
+                    }}
                     onStreamClosed={() => handleStreamClosed()}
-                    onDeployStart={onSidebarRefresh}
+                    onDeployStart={(deploymentId) => {
+                      if (deploymentId) {
+                        setActiveDeploymentIds(prev => ({ ...prev, [service.id]: deploymentId }));
+                        handleStatusUpdate(service.id, null, deploymentId);
+                      }
+                    }}
                   />
                   <StopButton
                     serviceId={service.id}
@@ -123,9 +141,17 @@ export function ServicesList({
                     environmentId={selectedEnvironmentId ?? null}
                     latestDeploymentStatus={status}
                     latestDeploymentId={service.latestDeployment?.id ?? null}
-                    onStatusUpdate={(newStatus) => updateServiceStatus(service.id, newStatus)}
+                    onStatusUpdate={(newStatus) => {
+                      const deploymentId = service.latestDeployment?.id;
+                      handleStatusUpdate(service.id, newStatus, deploymentId || undefined);
+                    }}
                     onStreamClosed={() => handleStreamClosed()}
-                    onStopStart={onSidebarRefresh}
+                    onStopStart={() => {
+                      const deploymentId = service.latestDeployment?.id;
+                      if (deploymentId) {
+                        handleStatusUpdate(service.id, null, deploymentId);
+                      }
+                    }}
                   />
                 </div>
               </div>

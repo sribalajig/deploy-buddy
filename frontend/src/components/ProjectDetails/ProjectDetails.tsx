@@ -41,6 +41,12 @@ export function ProjectDetails() {
     sidebarRef.current?.refetch();
   };
 
+  const handleDeploymentUpdate = (deploymentId: string) => {
+    if (selectedEnvironment?.id && selectedService?.id) {
+      sidebarRef.current?.fetchDeployment(deploymentId, selectedEnvironment.id, selectedService.id);
+    }
+  };
+
   if (loading) {
     return (
       <div className="project-details-container">
@@ -92,6 +98,7 @@ export function ProjectDetails() {
             error={error}
             onRefresh={refetch}
             onSidebarRefresh={handleSidebarRefresh}
+            onDeploymentUpdate={handleDeploymentUpdate}
             selectedEnvironmentId={selectedEnvironment?.id || null}
             onServiceClick={handleServiceClick}
             selectedServiceId={selectedService?.id || null}

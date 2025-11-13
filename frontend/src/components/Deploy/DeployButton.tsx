@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useDeployService } from '../../hooks/useDeployService';
 import './DeployButton.css';
 import { shouldDisableStart, isTerminalState } from '../../utils/deployment-status';
@@ -8,15 +8,16 @@ interface DeployButtonProps {
   serviceName: string;
   environmentId: string | null;
   latestDeploymentStatus: string | null;
-  onStatusUpdate?: (status: string) => void;
+  onStatusUpdate?: (status: string, deploymentId?: string) => void;
   onStreamClosed?: () => void;
-  onDeployStart?: () => void;
+  onDeployStart?: (deploymentId: string) => void;
 }
 
 export function DeployButton({ serviceId, serviceName, environmentId, latestDeploymentStatus, onStatusUpdate, onStreamClosed, onDeployStart }: DeployButtonProps) {
   const { deploy, loading } = useDeployService();
   const [currentStatus, setCurrentStatus] = useState<string | null>(latestDeploymentStatus);
   const [isDeployingState, setIsDeployingState] = useState<boolean>(false);
+  const deploymentIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     setCurrentStatus(latestDeploymentStatus);
@@ -34,10 +35,11 @@ export function DeployButton({ serviceId, serviceName, environmentId, latestDepl
     }
 
     setIsDeployingState(true);
+    deploymentIdRef.current = null;
 
     const result = await deploy(environmentId, serviceId, (status: string) => {
       setCurrentStatus(status);
-      onStatusUpdate?.(status);
+      onStatusUpdate?.(status, deploymentIdRef.current || undefined);
       if (isTerminalState(status)) {
         setIsDeployingState(false);
         onStreamClosed?.();
@@ -45,7 +47,8 @@ export function DeployButton({ serviceId, serviceName, environmentId, latestDepl
     });
 
     if (result.success && result.deploymentId) {
-      onDeployStart?.();
+      deploymentIdRef.current = result.deploymentId;
+      onDeployStart?.(result.deploymentId);
     }
 
     if (!result.success) {

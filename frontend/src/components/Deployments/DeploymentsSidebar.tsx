@@ -1,7 +1,7 @@
-import { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
+import { useState, useImperativeHandle, forwardRef } from 'react';
 import { useDeployments } from '../../hooks/useDeployments';
 import { useDeploymentLogs } from '../../hooks/useDeploymentLogs';
-import type { RailwayService, RailwayEnvironment } from '../../types/railway-service';
+import type { RailwayService, RailwayEnvironment, Deployment } from '../../types/railway-service';
 import './DeploymentsSidebar.css';
 
 interface DeploymentsSidebarProps {
@@ -13,17 +13,21 @@ interface DeploymentsSidebarProps {
 
 export interface DeploymentsSidebarRef {
   refetch: () => void;
+  upsertDeployment: (deployment: Deployment) => void;
+  fetchDeployment: (deploymentId: string, environmentId: string, serviceId: string) => Promise<void>;
 }
 
 export const DeploymentsSidebar = forwardRef<DeploymentsSidebarRef, DeploymentsSidebarProps>(
   ({ environment, service, isOpen, onClose }, ref) => {
-    const { deployments, loading, error, refetch } = useDeployments(
+    const { deployments, loading, error, refetch, upsertDeployment, fetchDeployment } = useDeployments(
       environment?.id || null, 
       service?.id || null);
     const [expandedDeploymentId, setExpandedDeploymentId] = useState<string | null>(null);
 
     useImperativeHandle(ref, () => ({
-      refetch
+      refetch,
+      upsertDeployment,
+      fetchDeployment,
     }));
 
     const toggleLogs = (deploymentId: string) => {
