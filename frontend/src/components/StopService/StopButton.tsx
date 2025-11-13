@@ -49,7 +49,6 @@ export function StopButton({
     }
 
     setIsStoppingState(true);
-    onStopStart?.();
 
     const result = await stopService(environmentId, serviceId, latestDeploymentId, (status: string) => {
       setCurrentStatus(status);
@@ -59,6 +58,10 @@ export function StopButton({
         onStreamClosed?.();
       }
     });
+
+    if (result.success) {
+      onStopStart?.();
+    }
 
     if (!result.success) {
       setIsStoppingState(false);
