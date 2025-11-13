@@ -1,50 +1,90 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useStopService } from '../../hooks/useStopService';
 import './StopButton.css';
-import { isNonTerminalState, shouldDisableStop } from '../../utils/deployment-status';
-import type { RailwayService } from '../../types/railway-service';
+import { shouldDisableStop, isTerminalState } from '../../utils/deployment-status';
 
 interface StopButtonProps {
-  service: RailwayService;
-  onStopSuccess?: () => void;
+  serviceId: string;
+  serviceName: string;
+  environmentId: string | null;
+  latestDeploymentStatus: string | null;
+  latestDeploymentId: string | null;
+  onStatusUpdate?: (status: string) => void;
+  onStreamClosed?: () => void;
+  onStopStart?: () => void;
 }
 
-export function StopButton({ service, onStopSuccess }: StopButtonProps) {
+export function StopButton({ 
+  serviceId, 
+  serviceName, 
+  environmentId, 
+  latestDeploymentStatus, 
+  latestDeploymentId,
+  onStatusUpdate, 
+  onStreamClosed, 
+  onStopStart 
+}: StopButtonProps) {
   const { stopService, loading } = useStopService();
-  const [stopStatus, setStopStatus] = useState<string | null>(null);
+  const [currentStatus, setCurrentStatus] = useState<string | null>(latestDeploymentStatus);
+  const [isStoppingState, setIsStoppingState] = useState<boolean>(false);
+
+  useEffect(() => {
+    setCurrentStatus(latestDeploymentStatus);
+    if (latestDeploymentStatus && !isTerminalState(latestDeploymentStatus)) {
+      const upperStatus = latestDeploymentStatus.toUpperCase();
+      if (upperStatus === 'REMOVING') {
+        setIsStoppingState(true);
+      } else {
+        setIsStoppingState(false);
+      }
+    } else {
+      setIsStoppingState(false);
+    }
+  }, [latestDeploymentStatus]);
 
   const handleStop = async (e: React.MouseEvent) => {
-    e.stopPropagation(); 
-    const result = await stopService(service);
-    
-    if (result.success) {
-      setStopStatus('Service stopped successfully');
-      onStopSuccess?.();
-    } else {
-      setStopStatus(`Failed to stop: ${result.message || 'Unknown error'}`);
+    e.stopPropagation();
+    if (!environmentId || !latestDeploymentId) {
+      return;
     }
-  
-    setTimeout(() => setStopStatus(null), 5000);
+
+    setIsStoppingState(true);
+    onStopStart?.();
+
+    const result = await stopService(environmentId, serviceId, latestDeploymentId, (status: string) => {
+      setCurrentStatus(status);
+      onStatusUpdate?.(status);
+      if (isTerminalState(status)) {
+        setIsStoppingState(false);
+        onStreamClosed?.();
+      }
+    });
+
+    if (!result.success) {
+      setIsStoppingState(false);
+    }
   };
 
-  const deploymentStatus = service.latestDeployment?.status ?? null;
-  const isDisabled = loading || shouldDisableStop(deploymentStatus ?? null);
+  const isDisabled = loading || shouldDisableStop(currentStatus);
+  const isStopping = isStoppingState || (currentStatus?.toUpperCase() === 'REMOVING');
 
   return (
     <div className="stop-button-container">
       <button
-        className={`stop-button ${loading ? 'loading' : ''} ${isDisabled ? 'disabled' : ''}`}
+        className={`stop-button ${isDisabled ? 'disabled' : ''} ${isStopping ? 'loading' : ''}`}
         onClick={handleStop}
         disabled={isDisabled}
         title={
-          deploymentStatus?.toUpperCase() === 'REMOVED' 
-            ? 'Service is already removed' 
-            : isNonTerminalState(deploymentStatus)
-            ? 'Cannot stop service while deployment is in progress'
-            : `Stop ${service.name}`
+          currentStatus?.toUpperCase() === 'REMOVED'
+            ? 'Service is already removed'
+            : !environmentId
+              ? 'Select an environment first'
+              : !latestDeploymentId
+                ? 'No deployment to stop'
+                : `Stop ${serviceName}`
         }
       >
-        {loading ? 'Stopping...' : 'Stop'}
+        {loading || isStopping ? 'Stopping...' : 'Stop'}
       </button>
     </div>
   );

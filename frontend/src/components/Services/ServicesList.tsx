@@ -39,10 +39,10 @@ export function ServicesList({
     setServiceStatuses(prev => ({ ...prev, [serviceId]: status }));
   };
 
-  const handleStreamClosed = (serviceId: string) => {
-    if (onRefresh) {
+  const handleStreamClosed = () => {
+    if (onSidebarRefresh) {
       setTimeout(() => {
-        onRefresh();
+        onSidebarRefresh();
       }, 500);
     }
   };
@@ -84,13 +84,6 @@ export function ServicesList({
         {services.map((service) => {
           const status = serviceStatuses[service.id] ?? service.latestDeployment?.status ?? null;
           const lastDeployedAt = service.latestDeployment?.updatedAt;
-          const serviceWithUpdatedStatus = {
-            ...service,
-            latestDeployment: status ? {
-              ...service.latestDeployment,
-              status
-            } : service.latestDeployment
-          };
 
           return (
             <li
@@ -121,12 +114,18 @@ export function ServicesList({
                     environmentId={selectedEnvironmentId ?? null}
                     latestDeploymentStatus={status}
                     onStatusUpdate={(newStatus) => updateServiceStatus(service.id, newStatus)}
-                    onStreamClosed={() => handleStreamClosed(service.id)}
+                    onStreamClosed={() => handleStreamClosed()}
                     onDeployStart={onSidebarRefresh}
                   />
                   <StopButton
-                    service={serviceWithUpdatedStatus}
-                    onStopSuccess={onRefresh}
+                    serviceId={service.id}
+                    serviceName={service.name}
+                    environmentId={selectedEnvironmentId ?? null}
+                    latestDeploymentStatus={status}
+                    latestDeploymentId={service.latestDeployment?.id ?? null}
+                    onStatusUpdate={(newStatus) => updateServiceStatus(service.id, newStatus)}
+                    onStreamClosed={() => handleStreamClosed()}
+                    onStopStart={onSidebarRefresh}
                   />
                 </div>
               </div>
