@@ -192,7 +192,7 @@ export class RailwayProxy implements IRailwayProxy {
         `;
 
         const result = await executeGraphQLQuery(query, {
-            projectId: getConfig('RAILWAY_PROJECT_ID'),
+            projectId: getConfig('DEPLOY_BUDDY_RAILWAY_PROJECT_ID'),
         });
 
         const projectData = result.data as ProjectData;
