@@ -79,7 +79,7 @@ export class DeploymentStreamingService implements IDeploymentStreamingService {
         clearInterval(pollInterval);
         stream.end();
       }
-    }, 5000);
+    }, 20000);
     
     return pollInterval;
   }

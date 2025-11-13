@@ -8,50 +8,46 @@ interface DeployButtonProps {
   serviceName: string;
   environmentId: string | null;
   latestDeploymentStatus: string | null;
+  onStatusUpdate?: (status: string) => void;
 }
 
-export function DeployButton({ serviceId, serviceName, environmentId, latestDeploymentStatus }: DeployButtonProps) {
+export function DeployButton({ serviceId, serviceName, environmentId, latestDeploymentStatus, onStatusUpdate }: DeployButtonProps) {
   const { deploy, loading } = useDeployService();
-  const [deploymentStatus, setDeploymentStatus] = useState<string | null>(null);
   const [currentStatus, setCurrentStatus] = useState<string | null>(latestDeploymentStatus);
+  const [isDeployingState, setIsDeployingState] = useState<boolean>(false);
 
   useEffect(() => {
     setCurrentStatus(latestDeploymentStatus);
+    if (latestDeploymentStatus && !isTerminalState(latestDeploymentStatus)) {
+      setIsDeployingState(true);
+    } else {
+      setIsDeployingState(false);
+    }
   }, [latestDeploymentStatus]);
 
   const handleDeploy = async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!environmentId) {
-      setDeploymentStatus('Please select an environment first');
       return;
     }
 
+    setIsDeployingState(true);
+
     const result = await deploy(environmentId, serviceId, (status: string) => {
       setCurrentStatus(status);
-      setDeploymentStatus(`Status: ${status}`);
+      onStatusUpdate?.(status);
+      if (isTerminalState(status)) {
+        setIsDeployingState(false);
+      }
     });
 
-    if (result.success) {
-      setDeploymentStatus(`Deployment started! ID: ${result.deploymentId}`);
-    } else {
-      setDeploymentStatus(`Deployment failed: ${result.message || 'Unknown error'}`);
-    }
-
     if (!result.success) {
-      setTimeout(() => setDeploymentStatus(null), 5000);
+      setIsDeployingState(false);
     }
   };
 
-  useEffect(() => {
-    if (currentStatus && isTerminalState(currentStatus)) {
-      setTimeout(() => {
-        setDeploymentStatus(null);
-      }, 3000);
-    }
-  }, [currentStatus]);
-
   const isDisabled = loading || shouldDisableStart(currentStatus);
-  const isDeploying = currentStatus && !isTerminalState(currentStatus);
+  const isDeploying = isDeployingState || (currentStatus && !isTerminalState(currentStatus));
 
   return (
     <div className="deploy-button-container">
@@ -67,13 +63,8 @@ export function DeployButton({ serviceId, serviceName, environmentId, latestDepl
               : `Start ${serviceName}`
         }
       >
-        {loading ? 'Starting...' : isDeploying ? `Deploying (${currentStatus})...` : 'Start'}
+        {loading || isDeploying ? 'Starting...' : 'Start'}
       </button>
-      {deploymentStatus && (
-        <div className={`deployment-status ${isTerminalState(currentStatus) ? 'success' : 'info'}`}>
-          {deploymentStatus}
-        </div>
-      )}
     </div>
   );
 }

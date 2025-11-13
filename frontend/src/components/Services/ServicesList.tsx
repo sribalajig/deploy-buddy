@@ -2,6 +2,7 @@ import type { RailwayService } from '../../types/railway-service';
 import { DeployButton } from '../Deploy/DeployButton';
 import { StopButton } from '../StopService/StopButton';
 import './ServicesList.css';
+import { useState, useEffect } from 'react';
 
 interface ServicesListProps {
   services: RailwayService[];
@@ -22,6 +23,20 @@ export function ServicesList({
   onServiceClick,
   selectedServiceId
 }: ServicesListProps) {
+  const [serviceStatuses, setServiceStatuses] = useState<Record<string, string | null>>({});
+
+  useEffect(() => {
+    const initialStatuses: Record<string, string | null> = {};
+    services.forEach(service => {
+      initialStatuses[service.id] = service.latestDeployment?.status ?? null;
+    });
+    setServiceStatuses(initialStatuses);
+  }, [services]);
+
+  const updateServiceStatus = (serviceId: string, status: string | null) => {
+    setServiceStatuses(prev => ({ ...prev, [serviceId]: status }));
+  };
+
   if (loading) {
     return (
       <div className="services-list-container">
@@ -57,7 +72,7 @@ export function ServicesList({
     <div className="services-list-container">
       <ul className="services-list">
         {services.map((service) => {
-          const status = service.latestDeployment?.status ?? null;
+          const status = serviceStatuses[service.id] ?? service.latestDeployment?.status ?? null;
           const lastDeployedAt = service.latestDeployment?.updatedAt;
 
           return (
@@ -88,6 +103,7 @@ export function ServicesList({
                     serviceName={service.name}
                     environmentId={selectedEnvironmentId ?? null}
                     latestDeploymentStatus={status}
+                    onStatusUpdate={(newStatus) => updateServiceStatus(service.id, newStatus)}
                   />
                   <StopButton
                     service={service}
