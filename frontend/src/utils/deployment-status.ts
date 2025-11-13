@@ -17,6 +17,9 @@ export function formatStatusDisplay(status: string | null | undefined): string {
   if (upperStatus === 'SUCCESS') {
     return 'Active';
   }
+  if (upperStatus === 'REMOVED') {
+    return 'Inactive';
+  }
   return status.charAt(0) + status.slice(1).toLowerCase();
 }
 

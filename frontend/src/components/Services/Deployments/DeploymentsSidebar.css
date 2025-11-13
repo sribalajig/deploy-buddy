@@ -204,8 +204,9 @@
 
 /* Status-specific colors */
 .deployments-sidebar .deployment-status.status-removed {
-  background-color: #f8d7da;
-  color: #721c24;
+  background-color: #e9ecef;
+  color: #495057;
+  border: 1px solid #ced4da;
 }
 
 .deployments-sidebar .deployment-status.status-active,

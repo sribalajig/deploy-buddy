@@ -1,0 +1,16 @@
+schema:
+  - https://railway.app/graphql
+  # Or if Railway requires auth, you might need to download the schema first
+  # For now, we'll use a different approach - see below
+
+documents:
+  - src/**/*.graphql
+
+generates:
+  src/generated/graphql.ts:
+    plugins:
+      - typescript
+      - typescript-operations
+    config:
+      avoidOptionals: true
+      immutableTypes: false

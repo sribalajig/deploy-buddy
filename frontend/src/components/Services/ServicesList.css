@@ -121,8 +121,9 @@
 }
 
 .service-status.status-removed {
-  background-color: #f8d7da;
-  color: #721c24;
+  background-color: #e9ecef;
+  color: #495057;
+  border: 1px solid #ced4da;
 }
 
 .service-status.status-active,
