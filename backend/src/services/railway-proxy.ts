@@ -3,6 +3,7 @@ import { executeGraphQLQuery } from '../utils/railway-http-client';
 import { getConfig } from '../utils/config';
 import { ProjectDetails, Service, Environment, DeploymentInstance, Deployment, DeploymentLog } from '../models/railway-proxy';
 import { DeployData, DeploymentsData, GraphQLResponse, ProjectData, DeploymentLogsData } from '../utils/railway-api-response';
+import { RailwayQueries, RailwayMutations } from './railway-gql-queries';
 
 interface IRailwayProxy {
     getProjectDetails(): Promise<ProjectDetails>;
@@ -28,13 +29,7 @@ export class RailwayProxy implements IRailwayProxy {
 
     public async deployService(environmentId: string, serviceId: string): Promise<DeploymentInstance> {
         try {
-            const mutation = `
-                mutation DeployService($environmentId: String!, $serviceId: String!) {
-                    serviceInstanceDeployV2(environmentId: $environmentId, serviceId: $serviceId)
-                }
-            `;
-
-            const result: GraphQLResponse = await executeGraphQLQuery(mutation, {
+            const result: GraphQLResponse = await executeGraphQLQuery(RailwayMutations.DEPLOY_SERVICE, {
                 environmentId,
                 serviceId,
             });
@@ -62,28 +57,7 @@ export class RailwayProxy implements IRailwayProxy {
 
     public async getDeployments(environmentId: string, serviceId: string, first: number = 10): Promise<Deployment[]> {
         try {
-            const query = `
-                query GetDeployments($environmentId: String!, $serviceId: String!, $first: Int!) {
-                    deployments(input: {environmentId: $environmentId, serviceId: $serviceId}, first: $first) {
-                        edges {
-                            node {
-                                id
-                                createdAt
-                                updatedAt
-                                status
-                                statusUpdatedAt
-                                staticUrl
-                                service {
-                                    id
-                                    name
-                                }
-                            }
-                        }
-                    }
-                }
-            `;
-
-            const result = await executeGraphQLQuery(query, {
+            const result = await executeGraphQLQuery(RailwayQueries.GET_DEPLOYMENTS, {
                 environmentId,
                 serviceId,
                 first,
@@ -110,13 +84,7 @@ export class RailwayProxy implements IRailwayProxy {
 
     public async removeDeployment(deploymentId: string): Promise<boolean> {
         try {
-            const mutation = `
-                mutation RemoveDeployment($id: String!) {
-                    deploymentRemove(id: $id)
-                }
-            `;
-
-            const result = await executeGraphQLQuery(mutation, {
+            const result = await executeGraphQLQuery(RailwayMutations.REMOVE_DEPLOYMENT, {
                 id: deploymentId,
             });
 
@@ -130,17 +98,7 @@ export class RailwayProxy implements IRailwayProxy {
 
     public async getDeploymentLogs(deploymentId: string, limit: number = 100): Promise<DeploymentLog[]> {
         try {
-            const query = `
-                query GetDeploymentLogs($deploymentId: String!, $limit: Int!) {
-                    deploymentLogs(deploymentId: $deploymentId, limit: $limit) {
-                        message
-                        severity
-                        timestamp
-                    }
-                }
-            `;
-
-            const result = await executeGraphQLQuery(query, {
+            const result = await executeGraphQLQuery(RailwayQueries.GET_DEPLOYMENT_LOGS, {
                 deploymentId,
                 limit,
             });
@@ -168,30 +126,7 @@ export class RailwayProxy implements IRailwayProxy {
     }
 
     private async getProjectData(): Promise<ProjectDetails> {
-        const query = `
-            query GetProject($projectId: String!) {
-                project(id: $projectId) {
-                    environments {
-                        edges {
-                            node {
-                                id
-                                name
-                            }
-                        }
-                    }
-                    services {
-                        edges {
-                            node {
-                                id
-                                name
-                            }
-                        }
-                    }
-                }
-            }
-        `;
-
-        const result = await executeGraphQLQuery(query, {
+        const result = await executeGraphQLQuery(RailwayQueries.GET_PROJECT, {
             projectId: getConfig('DEPLOY_BUDDY_RAILWAY_PROJECT_ID'),
         });
 
