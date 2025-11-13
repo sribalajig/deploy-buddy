@@ -1,6 +1,7 @@
 import type { RailwayService } from '../../types/railway-service';
 import { DeployButton } from '../Deploy/DeployButton';
 import { StopButton } from '../StopService/StopButton';
+import { formatStatusDisplay } from '../../utils/deployment-status';
 import './ServicesList.css';
 import { useState, useEffect } from 'react';
 
@@ -112,7 +113,7 @@ export function ServicesList({
                     )}
                     {status && (
                       <div className={`service-status status-${status.toLowerCase()}`}>
-                        {status.charAt(0) + status.slice(1).toLowerCase()}
+                        {formatStatusDisplay(status)}
                       </div>
                     )}
                   </div>

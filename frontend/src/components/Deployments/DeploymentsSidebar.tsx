@@ -2,6 +2,7 @@ import { useState, useImperativeHandle, forwardRef } from 'react';
 import { useDeployments } from '../../hooks/useDeployments';
 import { useDeploymentLogs } from '../../hooks/useDeploymentLogs';
 import type { RailwayService, RailwayEnvironment, Deployment } from '../../types/railway-service';
+import { formatStatusDisplay } from '../../utils/deployment-status';
 import './DeploymentsSidebar.css';
 
 interface DeploymentsSidebarProps {
@@ -76,7 +77,7 @@ export const DeploymentsSidebar = forwardRef<DeploymentsSidebarRef, DeploymentsS
                     )}
                     <div className="deployment-header">
                       <div className={`deployment-status status-${deployment.status?.toLowerCase() || 'unknown'}`}>
-                        {deployment.status ? deployment.status.charAt(0) + deployment.status.slice(1).toLowerCase() : 'Unknown'}
+                        {formatStatusDisplay(deployment.status)}
                       </div>
                       <div className="deployment-meta">
                         <span className="deployment-time">
