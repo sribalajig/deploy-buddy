@@ -38,8 +38,11 @@ const start = async () => {
   fastify.log.info(`Configured port: ${configuredPort}`);
 
   try {
-    await fastify.listen({ port: Number(applicationPort) });
-    fastify.log.info(`Server is running on http://localhost:${applicationPort}`);
+    await fastify.listen({ 
+      port: Number(applicationPort),
+      host: '0.0.0.0'
+    });
+    fastify.log.info(`Server is running on http://0.0.0.0:${applicationPort}`);
   } catch (err) {
     fastify.log.error(err);
     process.exit(1);
