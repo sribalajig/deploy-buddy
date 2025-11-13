@@ -9,9 +9,11 @@ interface DeployButtonProps {
   environmentId: string | null;
   latestDeploymentStatus: string | null;
   onStatusUpdate?: (status: string) => void;
+  onStreamClosed?: () => void;
+  onDeployStart?: () => void;
 }
 
-export function DeployButton({ serviceId, serviceName, environmentId, latestDeploymentStatus, onStatusUpdate }: DeployButtonProps) {
+export function DeployButton({ serviceId, serviceName, environmentId, latestDeploymentStatus, onStatusUpdate, onStreamClosed, onDeployStart }: DeployButtonProps) {
   const { deploy, loading } = useDeployService();
   const [currentStatus, setCurrentStatus] = useState<string | null>(latestDeploymentStatus);
   const [isDeployingState, setIsDeployingState] = useState<boolean>(false);
@@ -32,12 +34,14 @@ export function DeployButton({ serviceId, serviceName, environmentId, latestDepl
     }
 
     setIsDeployingState(true);
+    onDeployStart?.();
 
     const result = await deploy(environmentId, serviceId, (status: string) => {
       setCurrentStatus(status);
       onStatusUpdate?.(status);
       if (isTerminalState(status)) {
         setIsDeployingState(false);
+        onStreamClosed?.();
       }
     });
 
@@ -48,11 +52,12 @@ export function DeployButton({ serviceId, serviceName, environmentId, latestDepl
 
   const isDisabled = loading || shouldDisableStart(currentStatus);
   const isDeploying = isDeployingState || (currentStatus && !isTerminalState(currentStatus));
+  const isInitializing = currentStatus?.toUpperCase() === 'INITIALIZING';
 
   return (
     <div className="deploy-button-container">
       <button
-        className={`deploy-button ${isDisabled ? 'disabled' : ''} ${isDeploying ? 'deploying' : ''}`}
+        className={`deploy-button ${isDisabled ? 'disabled' : ''} ${isInitializing ? 'initializing' : isDeploying ? 'deploying' : ''}`}
         onClick={handleDeploy}
         disabled={isDisabled}
         title={

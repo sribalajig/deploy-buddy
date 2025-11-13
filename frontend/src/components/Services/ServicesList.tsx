@@ -9,6 +9,7 @@ interface ServicesListProps {
   loading?: boolean;
   error?: string | null;
   onRefresh?: () => void;
+  onSidebarRefresh?: () => void;
   selectedEnvironmentId?: string | null;
   onServiceClick?: (service: RailwayService) => void;
   selectedServiceId?: string | null;
@@ -19,6 +20,7 @@ export function ServicesList({
   loading = false,
   error = null,
   onRefresh,
+  onSidebarRefresh,
   selectedEnvironmentId,
   onServiceClick,
   selectedServiceId
@@ -35,6 +37,14 @@ export function ServicesList({
 
   const updateServiceStatus = (serviceId: string, status: string | null) => {
     setServiceStatuses(prev => ({ ...prev, [serviceId]: status }));
+  };
+
+  const handleStreamClosed = (serviceId: string) => {
+    if (onRefresh) {
+      setTimeout(() => {
+        onRefresh();
+      }, 500);
+    }
   };
 
   if (loading) {
@@ -74,6 +84,13 @@ export function ServicesList({
         {services.map((service) => {
           const status = serviceStatuses[service.id] ?? service.latestDeployment?.status ?? null;
           const lastDeployedAt = service.latestDeployment?.updatedAt;
+          const serviceWithUpdatedStatus = {
+            ...service,
+            latestDeployment: status ? {
+              ...service.latestDeployment,
+              status
+            } : service.latestDeployment
+          };
 
           return (
             <li
@@ -104,9 +121,11 @@ export function ServicesList({
                     environmentId={selectedEnvironmentId ?? null}
                     latestDeploymentStatus={status}
                     onStatusUpdate={(newStatus) => updateServiceStatus(service.id, newStatus)}
+                    onStreamClosed={() => handleStreamClosed(service.id)}
+                    onDeployStart={onSidebarRefresh}
                   />
                   <StopButton
-                    service={service}
+                    service={serviceWithUpdatedStatus}
                     onStopSuccess={onRefresh}
                   />
                 </div>

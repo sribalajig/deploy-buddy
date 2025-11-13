@@ -41,6 +41,15 @@
   background-color: #e0a800;
 }
 
+.deploy-button.initializing {
+  background-color: #17a2b8;
+  color: #fff;
+}
+
+.deploy-button.initializing:hover:not(.disabled) {
+  background-color: #138496;
+}
+
 .deployment-status {
   font-size: 0.85rem;
   padding: 0.25rem 0.5rem;

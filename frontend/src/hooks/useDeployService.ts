@@ -14,7 +14,7 @@ interface DeploymentStatusUpdate {
 }
 
 interface UseDeployServiceReturn {
-  deploy: (environmentId: string, serviceId: string, onStatusUpdate?: (status: string) => void) => Promise<DeployResponse>;
+  deploy: (environmentId: string, serviceId: string, onStatusUpdate?: (status: string) => void, onStreamClosed?: () => void) => Promise<DeployResponse>;
   loading: boolean;
   error: string | null;
 }
@@ -27,7 +27,8 @@ export function useDeployService(): UseDeployServiceReturn {
   const deploy = useCallback(async (
     environmentId: string, 
     serviceId: string,
-    onStatusUpdate?: (status: string) => void
+    onStatusUpdate?: (status: string) => void,
+    onStreamClosed?: () => void
   ): Promise<DeployResponse> => {
     try {
       setLoading(true);
@@ -65,6 +66,7 @@ export function useDeployService(): UseDeployServiceReturn {
               console.error('Deployment status error:', update.error);
               eventSource.close();
               eventSourceRef.current = null;
+              onStreamClosed?.();
               return;
             }
 
@@ -74,6 +76,7 @@ export function useDeployService(): UseDeployServiceReturn {
               if (isTerminalState(update.status)) {
                 eventSource.close();
                 eventSourceRef.current = null;
+                onStreamClosed?.();
               }
             }
           } catch (err) {
@@ -85,6 +88,7 @@ export function useDeployService(): UseDeployServiceReturn {
           console.error('EventSource error:', err);
           eventSource.close();
           eventSourceRef.current = null;
+          onStreamClosed?.();
         };
       }
 

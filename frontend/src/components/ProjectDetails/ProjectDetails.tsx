@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRailwayProjectDetails } from '../../hooks/useRailwayProjectDetailsReturn';
 import { ServicesList } from '../Services/ServicesList';
 import { EnvironmentsDropdown } from '../Environments/EnvironmentsDropdown';
 import { DeploymentsSidebar } from '../Deployments/DeploymentsSidebar';
+import type { DeploymentsSidebarRef } from '../Deployments/DeploymentsSidebar';
 import type { RailwayEnvironment, RailwayService } from '../../types/railway-service';
 import './ProjectDetails.css';
 
@@ -11,6 +12,7 @@ export function ProjectDetails() {
   const [selectedEnvironment, setSelectedEnvironment] = useState<RailwayEnvironment | null>(null);
   const [selectedService, setSelectedService] = useState<RailwayService | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
+  const sidebarRef = useRef<DeploymentsSidebarRef>(null);
 
   useEffect(() => {
     if (projectDetails?.environments && projectDetails.environments.length > 0 && !selectedEnvironment) {
@@ -33,6 +35,10 @@ export function ProjectDetails() {
   const handleSidebarClose = () => {
     setIsSidebarOpen(false);
     setSelectedService(null);
+  };
+
+  const handleSidebarRefresh = () => {
+    sidebarRef.current?.refetch();
   };
 
   if (loading) {
@@ -85,12 +91,14 @@ export function ProjectDetails() {
             loading={loading}
             error={error}
             onRefresh={refetch}
+            onSidebarRefresh={handleSidebarRefresh}
             selectedEnvironmentId={selectedEnvironment?.id || null}
             onServiceClick={handleServiceClick}
             selectedServiceId={selectedService?.id || null}
           />
         </div>
         <DeploymentsSidebar
+          ref={sidebarRef}
           environment={selectedEnvironment}
           service={selectedService}
           isOpen={isSidebarOpen}
