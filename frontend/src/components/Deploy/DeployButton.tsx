@@ -34,7 +34,6 @@ export function DeployButton({ serviceId, serviceName, environmentId, latestDepl
     }
 
     setIsDeployingState(true);
-    onDeployStart?.();
 
     const result = await deploy(environmentId, serviceId, (status: string) => {
       setCurrentStatus(status);
@@ -44,6 +43,10 @@ export function DeployButton({ serviceId, serviceName, environmentId, latestDepl
         onStreamClosed?.();
       }
     });
+
+    if (result.success && result.deploymentId) {
+      onDeployStart?.();
+    }
 
     if (!result.success) {
       setIsDeployingState(false);
