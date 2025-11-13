@@ -1,6 +1,6 @@
-import type { RailwayService } from '../../types/railway-service';
-import { DeployButton } from '../Deploy/DeployButton';
-import { StopButton } from '../StopService/StopButton';
+import type { RailwayService } from '../../types/types';
+import { DeployButton } from './Start/DeployButton';
+import { StopButton } from './Stop/StopButton';
 import { formatStatusDisplay } from '../../utils/deployment-status';
 import './ServicesList.css';
 import { useState, useEffect } from 'react';

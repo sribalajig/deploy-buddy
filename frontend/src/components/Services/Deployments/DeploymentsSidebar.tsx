@@ -1,8 +1,8 @@
 import { useState, useImperativeHandle, forwardRef } from 'react';
-import { useDeployments } from '../../hooks/useDeployments';
-import { useDeploymentLogs } from '../../hooks/useDeploymentLogs';
-import type { RailwayService, RailwayEnvironment, Deployment } from '../../types/railway-service';
-import { formatStatusDisplay } from '../../utils/deployment-status';
+import { useDeployments } from '../../../hooks/useDeployments';
+import { useDeploymentLogs } from '../../../hooks/useDeploymentLogs';
+import type { RailwayService, RailwayEnvironment, Deployment } from '../../../types/types';
+import { formatStatusDisplay } from '../../../utils/deployment-status';
 import './DeploymentsSidebar.css';
 
 interface DeploymentsSidebarProps {
@@ -19,7 +19,7 @@ export interface DeploymentsSidebarRef {
 }
 
 export const DeploymentsSidebar = forwardRef<DeploymentsSidebarRef, DeploymentsSidebarProps>(
-  ({ environment, service, isOpen, onClose }, ref) => {
+  ({ environment, service, isOpen }, ref) => {
     const { deployments, loading, error, refetch, upsertDeployment, fetchDeployment } = useDeployments(
       environment?.id || null, 
       service?.id || null);

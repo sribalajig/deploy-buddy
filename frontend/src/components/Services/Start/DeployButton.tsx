@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import { useDeployService } from '../../hooks/useDeployService';
+import { useDeployService } from '../../../hooks/useDeployService';
 import './DeployButton.css';
-import { shouldDisableStart, isTerminalState } from '../../utils/deployment-status';
+import { shouldDisableStart, isTerminalState } from '../../../utils/deployment-status';
 
 interface DeployButtonProps {
   serviceId: string;

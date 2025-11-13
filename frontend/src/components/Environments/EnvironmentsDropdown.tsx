@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { RailwayEnvironment } from '../../types/railway-service';
+import type { RailwayEnvironment } from '../../types/types';
 import './EnvironmentsDropdown.css';
 
 interface EnvironmentsDropdownProps {

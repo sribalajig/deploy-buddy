@@ -2,9 +2,9 @@ import { useState, useEffect, useRef } from 'react';
 import { useRailwayProjectDetails } from '../../hooks/useRailwayProjectDetailsReturn';
 import { ServicesList } from '../Services/ServicesList';
 import { EnvironmentsDropdown } from '../Environments/EnvironmentsDropdown';
-import { DeploymentsSidebar } from '../Deployments/DeploymentsSidebar';
-import type { DeploymentsSidebarRef } from '../Deployments/DeploymentsSidebar';
-import type { RailwayEnvironment, RailwayService, Deployment } from '../../types/railway-service';
+import { DeploymentsSidebar } from '../Services/Deployments/DeploymentsSidebar';
+import type { DeploymentsSidebarRef } from '../Services/Deployments/DeploymentsSidebar';
+import type { RailwayEnvironment, RailwayService, Deployment } from '../../types/types';
 import './ProjectDetails.css';
 
 export function ProjectDetails() {

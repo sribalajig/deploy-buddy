@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { API_CONFIG } from '../utils/config';
-import type { Deployment } from '../types/railway-service';
+import type { Deployment } from '../types/types';
 
 interface UseDeploymentsReturn {
   deployments: Deployment[];

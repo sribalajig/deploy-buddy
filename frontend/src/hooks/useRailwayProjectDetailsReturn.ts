@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import type { ProjectDetails } from '../types/railway-service';
+import type { ProjectDetails } from '../types/types';
 import { API_CONFIG } from '../utils/config';
 
 interface UseProjectDetailsReturn {

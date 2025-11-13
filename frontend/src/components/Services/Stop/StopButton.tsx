@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useStopService } from '../../hooks/useStopService';
+import { useStopService } from '../../../hooks/useStopService';
 import './StopButton.css';
-import { shouldDisableStop, isTerminalState } from '../../utils/deployment-status';
+import { shouldDisableStop, isTerminalState } from '../../../utils/deployment-status';
 
 interface StopButtonProps {
   serviceId: string;
