@@ -2,7 +2,7 @@ import { FastifyRequest, FastifyReply } from 'fastify';
 import { RailwayProxy } from '../services/railway-proxy';
 import { injectable } from 'tsyringe';
 import { DeployServiceParams, GetDeploymentsParams, RemoveDeploymentParams, GetDeploymentLogsParams, GetDeploymentParams } from './request-dtos';
-import { DeploymentStreamingService } from '../services/deployment-streaming';
+import { DeploymentStreamingService } from '../services/railway-deployment-streaming';
 import { ISSEStream, IClientConnection } from '../utils/sse-stream';
 
 @injectable()

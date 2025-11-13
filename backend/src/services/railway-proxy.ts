@@ -1,5 +1,5 @@
 import { injectable } from 'tsyringe';
-import { executeGraphQLQuery } from '../utils/http';
+import { executeGraphQLQuery } from '../utils/railway-http-client';
 import { getConfig } from '../utils/config';
 import { ProjectDetails, Service, Environment, DeploymentInstance, Deployment, DeploymentLog } from '../models/railway-proxy';
 import { DeployData, DeploymentsData, GraphQLResponse, ProjectData, DeploymentLogsData } from '../utils/railway-api-response';
